@@ -6,9 +6,8 @@ use emoji;
 use failure::{Error, ResultExt};
 use progressbar::Step;
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::str;
-use tempfile;
 use PBAR;
 
 /// Ensure that `rustc` is present and that it is >= 1.30.0
@@ -50,6 +49,26 @@ fn rustc_minor_version() -> Option<u32> {
     otry!(pieces.next()).parse().ok()
 }
 
+fn check_wasm32_target() -> Result<bool, Error> {
+    let echo_cmd = Command::new("echo")
+        .arg("fn main(){}")
+        .stdout(Stdio::piped())
+        .spawn()
+        .context("failed to spawn `echo` when checking wasm32-unknown-unknown target")?;
+
+    let status = Command::new("rustc")
+        .arg("--target")
+        .arg("wasm32-unknown-unknown")
+        .arg("-")
+        .stdin(echo_cmd.stdout.unwrap())
+        .status();
+
+    match status {
+        Ok(status) if status.success() => Ok(true),
+        _ => Ok(false),
+    }
+}
+
 /// Ensure that `rustup` has the `wasm32-unknown-unknown` target installed for
 /// current toolchain
 pub fn rustup_add_wasm_target(step: &Step) -> Result<(), Error> {
@@ -58,19 +77,8 @@ pub fn rustup_add_wasm_target(step: &Step) -> Result<(), Error> {
 
     // Checking wether we can already compile to wasm with the rustc
     // we have in scope.
-    let dir = tempfile::TempDir::new()?;
-    let p = dir.path().join("main.rs");
-    {
-        let mut f = File::create(&p)?;
-        writeln!(f, "fn main(){{}}")?;
-    }
-    match Command::new("rustc")
-        .arg("--target")
-        .arg("wasm32-unknown-unknown")
-        .arg(p.to_str().unwrap())
-        .status()
-    {
-        Ok(ref e) if e.success() => return Ok(()),
+    match check_wasm32_target() {
+        Ok(true) => return Ok(()),
         _ => {}
     }
 
