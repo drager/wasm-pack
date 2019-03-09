@@ -6,7 +6,7 @@ use emoji;
 use failure::{Error, ResultExt};
 use progressbar::Step;
 use std::path::Path;
-use std::process::{Command, Output, Stdio};
+use std::process::{Command, Stdio};
 use std::str;
 use PBAR;
 
@@ -89,7 +89,7 @@ fn check_for_rustup(sysroot: &str) -> Result<bool, Error> {
     if sysroot.contains(".rustup") {
         rustup_add_wasm_target()
     } else {
-        Ok(false)
+        bail!("wasm32-unknown-unknown target not found!")
     }
 }
 
