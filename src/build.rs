@@ -6,7 +6,7 @@ use emoji;
 use failure::{Error, ResultExt};
 use progressbar::Step;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::{Command, Output, Stdio};
 use std::str;
 use PBAR;
 
@@ -49,43 +49,83 @@ fn rustc_minor_version() -> Option<u32> {
     otry!(pieces.next()).parse().ok()
 }
 
-fn check_wasm32_target() -> Result<bool, Error> {
-    let echo_cmd = Command::new("echo")
-        .arg("fn main(){}")
+fn get_rustc_sysroot() -> Result<String, std::string::FromUtf8Error> {
+    let sysroot = Command::new("rustc")
+        .args(&["--print", "sysroot"])
         .stdout(Stdio::piped())
-        .spawn()
-        .context("failed to spawn `echo` when checking wasm32-unknown-unknown target")?;
+        .output()
+        .unwrap();
+    String::from_utf8(sysroot.stdout)
+}
 
-    let status = Command::new("rustc")
-        .arg("--target")
-        .arg("wasm32-unknown-unknown")
-        .arg("-")
-        .stdin(echo_cmd.stdout.unwrap())
+/// Checks if the wasm32-unknown-unknown is present on the machine.
+fn wasm32_target_in_sysroot(sysroot: &str) -> Result<bool, Error> {
+    let wasm32_target = "wasm32-unknown-unknown";
+
+    let rustlib_path = &format!("{}/lib/rustlib", sysroot.replace("\n", ""));
+
+    dbg!(&rustlib_path);
+
+    let ls_command = Command::new("ls")
+        .arg(rustlib_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()?;
+
+    let grep_command_status = Command::new("grep")
+        .args(&["-x", wasm32_target])
+        .stdin(ls_command.stdout.unwrap())
         .status();
 
-    match status {
+    match grep_command_status {
         Ok(status) if status.success() => Ok(true),
         _ => Ok(false),
     }
 }
 
+fn check_for_rustup(sysroot: &str) -> Result<bool, Error> {
+    // If sysroot contains .rustup, then we're using rustup.
+    // Then we can use rustup to add the wasm32-unknown-unknown target.
+    if sysroot.contains(".rustup") {
+        rustup_add_wasm_target()
+    } else {
+        Ok(false)
+    }
+}
+
+fn check_wasm32_target() -> Result<bool, Error> {
+    let sysroot = get_rustc_sysroot()?;
+
+    // If wasm32-unknown-unknown already exists we're ok.
+    match wasm32_target_in_sysroot(&sysroot) {
+        Ok(true) => return Ok(true),
+        // If it doesn't exist, then we need to check if we're using rustup.
+        _ => check_for_rustup(&sysroot),
+    }
+}
+
+/// Add wasm32-unknown-unknown using `rustup`.
+fn rustup_add_wasm_target() -> Result<bool, Error> {
+    let mut cmd = Command::new("rustup");
+    cmd.arg("target").arg("add").arg("wasm32-unknown-unknown");
+    child::run(cmd, "rustup").context("Adding the wasm32-unknown-unknown target with rustup")?;
+
+    Ok(true)
+}
+
 /// Ensure that `rustup` has the `wasm32-unknown-unknown` target installed for
 /// current toolchain
-pub fn rustup_add_wasm_target(step: &Step) -> Result<(), Error> {
+pub fn check_for_wasm32_target(step: &Step) -> Result<(), Error> {
     let msg = format!("{}Adding WASM target...", emoji::TARGET);
     PBAR.step(step, &msg);
 
-    // Checking wether we can already compile to wasm with the rustc
+    // Checking wether we can compile to wasm with the rustc
     // we have in scope.
     match check_wasm32_target() {
         Ok(true) => return Ok(()),
         _ => {}
     }
 
-    // If not, using rustup to add it.
-    let mut cmd = Command::new("rustup");
-    cmd.arg("target").arg("add").arg("wasm32-unknown-unknown");
-    child::run(cmd, "rustup").context("Adding the wasm32-unknown-unknown target with rustup")?;
     Ok(())
 }
 

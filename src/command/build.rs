@@ -283,7 +283,7 @@ impl Build {
 
     fn step_add_wasm_target(&mut self, step: &Step) -> Result<(), Error> {
         info!("Adding wasm-target...");
-        build::rustup_add_wasm_target(step)?;
+        build::check_for_wasm32_target(step)?;
         info!("Adding wasm-target was successful.");
         Ok(())
     }
