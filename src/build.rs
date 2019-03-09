@@ -99,7 +99,7 @@ fn check_wasm32_target() -> Result<bool, Error> {
 
     // If wasm32-unknown-unknown already exists we're ok.
     match is_wasm32_target_in_sysroot(&sysroot) {
-        Ok(true) => return Ok(true),
+        Ok(true) => Ok(true),
         // If it doesn't exist, then we need to check if we're using rustup.
         _ => {
             // If sysroot contains .rustup, then we can assume we're using rustup
@@ -130,7 +130,7 @@ pub fn check_for_wasm32_target(step: &Step) -> Result<(), Error> {
 
     // Check if wasm32 target is present, otherwise bail.
     match check_wasm32_target() {
-        Ok(true) => return Ok(()),
+        Ok(true) => Ok(()),
         _ => bail!("wasm32-unknown-unknown target not found!"),
     }
 }
