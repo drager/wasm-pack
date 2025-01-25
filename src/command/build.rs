@@ -361,7 +361,7 @@ impl Build {
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
         info!("Checking for wasm-target...");
-        build::wasm_target::check_for_wasm32_target()?;
+        build::wasm_target::check_for_wasm32_target(self.crate_data.get_target_triple())?;
         info!("Checking for wasm-target was successful.");
         Ok(())
     }

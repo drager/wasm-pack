@@ -41,7 +41,7 @@ pub fn wasm_bindgen_build(
     };
 
     let wasm_path = target_directory
-        .join("wasm32-unknown-unknown")
+        .join(data.get_target_triple())
         .join(profile_name)
         .join(data.crate_name())
         .with_extension("wasm");

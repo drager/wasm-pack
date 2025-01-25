@@ -53,12 +53,12 @@ impl fmt::Display for Wasm32Check {
 
 /// Ensure that `rustup` has the `wasm32-unknown-unknown` target installed for
 /// current toolchain
-pub fn check_for_wasm32_target() -> Result<()> {
-    let msg = format!("{}Checking for the Wasm target...", emoji::TARGET);
+pub fn check_for_wasm32_target(target_triple: String) -> Result<()> {
+    let msg = format!("{}Checking for the Wasm target {}...", emoji::TARGET, target_triple);
     PBAR.info(&msg);
 
     // Check if wasm32 target is present, otherwise bail.
-    match check_wasm32_target() {
+    match check_wasm32_target(target_triple) {
         Ok(ref wasm32_check) if wasm32_check.found => Ok(()),
         Ok(wasm32_check) => bail!("{}", wasm32_check),
         Err(err) => Err(err),
@@ -82,11 +82,11 @@ fn get_rustc_sysroot() -> Result<PathBuf> {
 }
 
 /// Get wasm32-unknown-unknown target libdir
-fn get_rustc_wasm32_unknown_unknown_target_libdir() -> Result<PathBuf> {
+fn get_rustc_target_triple_libdir(target_triple: String) -> Result<PathBuf> {
     let command = Command::new("rustc")
         .args(&[
             "--target",
-            "wasm32-unknown-unknown",
+            target_triple.as_str(),
             "--print",
             "target-libdir",
         ])
@@ -96,26 +96,29 @@ fn get_rustc_wasm32_unknown_unknown_target_libdir() -> Result<PathBuf> {
         Ok(String::from_utf8(command.stdout)?.trim().into())
     } else {
         Err(anyhow!(
-            "Getting rustc's wasm32-unknown-unknown target wasn't successful. Got {}",
+            "Getting rustc's {} target wasn't successful. Got {}",
+            target_triple,
             command.status
         ))
     }
 }
 
-fn does_wasm32_target_libdir_exist() -> bool {
-    let result = get_rustc_wasm32_unknown_unknown_target_libdir();
+fn does_wasm32_target_libdir_exist(target_triple: String) -> bool {
+    let result = get_rustc_target_triple_libdir(target_triple.clone());
 
     match result {
         Ok(wasm32_target_libdir_path) => {
             if wasm32_target_libdir_path.exists() {
                 info!(
-                    "Found wasm32-unknown-unknown in {:?}",
+                    "Found {} in {:?}",
+                    target_triple,
                     wasm32_target_libdir_path
                 );
                 true
             } else {
                 info!(
-                    "Failed to find wasm32-unknown-unknown in {:?}",
+                    "Failed to find {} in {:?}",
+                    target_triple,
                     wasm32_target_libdir_path
                 );
                 false
@@ -128,11 +131,11 @@ fn does_wasm32_target_libdir_exist() -> bool {
     }
 }
 
-fn check_wasm32_target() -> Result<Wasm32Check> {
+fn check_wasm32_target(target_triple: String) -> Result<Wasm32Check> {
     let sysroot = get_rustc_sysroot()?;
     let rustc_path = which::which("rustc")?;
 
-    if does_wasm32_target_libdir_exist() {
+    if does_wasm32_target_libdir_exist(target_triple.clone()) {
         Ok(Wasm32Check {
             rustc_path,
             sysroot,
@@ -144,7 +147,7 @@ fn check_wasm32_target() -> Result<Wasm32Check> {
         // If sysroot contains "rustup", then we can assume we're using rustup
         // and use rustup to add the wasm32-unknown-unknown target.
         if sysroot.to_string_lossy().contains("rustup") {
-            rustup_add_wasm_target().map(|()| Wasm32Check {
+            rustup_add_wasm_target(target_triple).map(|()| Wasm32Check {
                 rustc_path,
                 sysroot,
                 found: true,
@@ -161,11 +164,11 @@ fn check_wasm32_target() -> Result<Wasm32Check> {
     }
 }
 
-/// Add wasm32-unknown-unknown using `rustup`.
-fn rustup_add_wasm_target() -> Result<()> {
+/// Add target_triple using `rustup`.
+fn rustup_add_wasm_target(target_triple: String) -> Result<()> {
     let mut cmd = Command::new("rustup");
-    cmd.arg("target").arg("add").arg("wasm32-unknown-unknown");
-    child::run(cmd, "rustup").context("Adding the wasm32-unknown-unknown target with rustup")?;
+    cmd.arg("target").arg("add").arg(target_triple.clone());
+    child::run(cmd, "rustup").context(format!("Adding the {} target with rustup", target_triple))?;
 
     Ok(())
 }
