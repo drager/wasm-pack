@@ -38,6 +38,7 @@ pub struct CrateData {
     current_idx: usize,
     manifest: CargoManifest,
     out_name: Option<String>,
+    target_triple: String,
 }
 
 #[doc(hidden)]
@@ -434,6 +435,18 @@ pub struct ManifestAndUnusedKeys {
     pub unused_keys: BTreeSet<String>,
 }
 
+#[doc(hidden)]
+#[derive(Deserialize)]
+pub struct ConfigManifest {
+    build: Option<ConfigTarget>,
+}
+
+#[doc(hidden)]
+#[derive(Deserialize)]
+pub struct ConfigTarget {
+    target: Option<String>,
+}
+
 impl CrateData {
     /// Reads all metadata for the crate whose manifest is inside the directory
     /// specified by `path`.
@@ -464,11 +477,14 @@ impl CrateData {
             })
             .ok_or_else(|| anyhow!("failed to find package in metadata"))?;
 
+        let target_triple = Self::calculate_target_triple(crate_path);
+
         Ok(CrateData {
             data,
             manifest,
             current_idx,
             out_name,
+            target_triple,
         })
     }
 
@@ -514,6 +530,35 @@ impl CrateData {
         })
     }
 
+    /// Parses config data in order to figure out the target triple.
+    /// If the config file does not exist, or if there is no target triple specified,
+    /// the target triple is assumed to be wasm32-unknown-unknown.
+    fn calculate_target_triple(crate_path: &Path) -> String {
+        let config_path = crate_path.join(".cargo/config.toml");
+        let mut target_triple = String::from("wasm32-unknown-unknown");
+        if config_path.is_file() {
+            let config = match fs::read_to_string(&config_path) {
+                Err(_e) => return target_triple,
+                Ok(f) => f,
+            };
+
+            let config: ConfigManifest = toml::from_str(config.as_str()).unwrap();
+            if config.build.is_some() {
+                let target = config.build.unwrap().target;
+                if target.is_some() {
+                    target_triple = target.unwrap();
+                }
+            }
+        }
+        target_triple
+    }
+
+    /// Returns the target triple for the build. This is read from .cargo/config.toml.
+    /// By default, target_triple will be wasm32-unknown-unknown.
+    pub fn get_target_triple(&self) -> String {
+        self.target_triple.clone()
+    }
+
     /// Iterating through all the passed `unused_keys` and output
     /// a warning for each unknown key.
     pub fn warn_for_unused_keys(manifest_and_keys: &ManifestAndUnusedKeys) {
@@ -552,10 +597,10 @@ impl CrateData {
             return Ok(());
         }
         bail!(
-            "crate-type must be cdylib to compile to wasm32-unknown-unknown. Add the following to your \
+            "crate-type must be cdylib to compile to {}. Add the following to your \
              Cargo.toml file:\n\n\
              [lib]\n\
-             crate-type = [\"cdylib\", \"rlib\"]"
+             crate-type = [\"cdylib\", \"rlib\"]", &self.target_triple
         )
     }
 

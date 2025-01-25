@@ -368,14 +368,14 @@ impl Build {
 
     fn step_build_wasm(&mut self) -> Result<()> {
         info!("Building wasm...");
-        build::cargo_build_wasm(&self.crate_path, self.profile.clone(), &self.extra_options)?;
+        build::cargo_build_wasm(&self.crate_path, self.profile.clone(), self.crate_data.get_target_triple(), &self.extra_options)?;
 
         info!(
             "wasm built at {:#?}.",
             &self
                 .crate_path
                 .join("target")
-                .join("wasm32-unknown-unknown")
+                .join(self.crate_data.get_target_triple())
                 .join("release")
         );
         Ok(())
