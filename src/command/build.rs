@@ -270,7 +270,12 @@ impl Build {
 
     /// Execute this `Build` command.
     pub fn run(&mut self) -> Result<()> {
-        let process_steps = Build::get_process_steps(self.mode, self.no_pack, self.no_opt);
+        let process_steps = Build::get_process_steps(
+            self.mode,
+            self.no_pack,
+            self.no_opt,
+            self.crate_data.get_target_triple(),
+        );
 
         let started = Instant::now();
 
@@ -299,6 +304,7 @@ impl Build {
         mode: InstallMode,
         no_pack: bool,
         no_opt: bool,
+        target_triple: String,
     ) -> Vec<(&'static str, BuildStep)> {
         macro_rules! steps {
             ($($name:ident),+) => {
@@ -322,23 +328,32 @@ impl Build {
             }
         }
 
-        steps.extend(steps![
-            step_build_wasm,
-            step_create_dir,
-            step_install_wasm_bindgen,
-            step_run_wasm_bindgen,
-        ]);
-
-        if !no_opt {
-            steps.extend(steps![step_run_wasm_opt]);
-        }
-
-        if !no_pack {
+        if target_triple.ends_with("-emscripten") {
             steps.extend(steps![
-                step_create_json,
-                step_copy_readme,
-                step_copy_license,
+                step_install_wasm_bindgen,
+                step_build_wasm,
+                step_create_dir,
+                step_copy_emscripten_outputs,
             ]);
+        } else {
+            steps.extend(steps![
+                step_build_wasm,
+                step_create_dir,
+                step_install_wasm_bindgen,
+                step_run_wasm_bindgen,
+            ]);
+
+            if !no_opt {
+                steps.extend(steps![step_run_wasm_opt]);
+            }
+
+            if !no_pack {
+                steps.extend(steps![
+                    step_create_json,
+                    step_copy_readme,
+                    step_copy_license,
+                ]);
+            }
         }
 
         steps
@@ -361,21 +376,26 @@ impl Build {
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
         info!("Checking for wasm-target...");
-        build::wasm_target::check_for_wasm32_target()?;
+        build::wasm_target::check_for_wasm32_target(self.crate_data.get_target_triple())?;
         info!("Checking for wasm-target was successful.");
         Ok(())
     }
 
     fn step_build_wasm(&mut self) -> Result<()> {
         info!("Building wasm...");
-        build::cargo_build_wasm(&self.crate_path, self.profile.clone(), &self.extra_options)?;
+        build::cargo_build_wasm(
+            &self.crate_path,
+            self.profile.clone(),
+            self.crate_data.get_target_triple(),
+            &self.extra_options,
+        )?;
 
         info!(
             "wasm built at {:#?}.",
             &self
                 .crate_path
                 .join("target")
-                .join("wasm32-unknown-unknown")
+                .join(self.crate_data.get_target_triple())
                 .join("release")
         );
         Ok(())
@@ -417,6 +437,13 @@ impl Build {
     }
 
     fn step_install_wasm_bindgen(&mut self) -> Result<()> {
+        // TODO(walkingeye): How does this work when this happens before
+        // building the Wasm? There is no Cargo.lock file at that point.
+        // TODO(walkingeye): How does this work when wasm-bindgen points to a
+        // local copy? It still is determining a version and installing it. This
+        // might be a problem I can ignore.
+        // TODO(walkingeye): Require a minimum version of wasm-bindgen for
+        // -emscripten support.
         info!("Identifying wasm-bindgen dependency...");
         let lockfile = Lockfile::new(&self.crate_data)?;
         let bindgen_version = lockfile.require_wasm_bindgen()?;
@@ -447,6 +474,32 @@ impl Build {
             &self.extra_options,
         )?;
         info!("wasm bindings were built at {:#?}.", &self.out_dir);
+        Ok(())
+    }
+
+    fn step_copy_emscripten_outputs(&mut self) -> Result<()> {
+        info!("Copying Emscripten outputs...");
+
+        let profile_name = match self.profile.clone() {
+            BuildProfile::Release | BuildProfile::Profiling => "release",
+            BuildProfile::Dev => "debug",
+            BuildProfile::Custom(profile_name) => &profile_name.clone(),
+        };
+
+        let wasm_path = self
+            .crate_data
+            .target_directory()
+            .join(self.crate_data.get_target_triple())
+            .join(profile_name)
+            .join(self.crate_data.crate_name());
+
+        // TODO(walkingeye): Actually do the copy here. Right now something
+        // is passing `-o /path/to/final.wasm` to the linker, which causes
+        // Emscripten to not output the .js at all. We can sort of override
+        // this was --oformat=js, but then the .js file has the .wasm extension.
+        // I suspect this is a bad assumption in rustc.
+
+        info!("Outputs were copied to {:#?}.", &self.out_dir);
         Ok(())
     }
 
