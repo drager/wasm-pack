@@ -270,7 +270,12 @@ impl Build {
 
     /// Execute this `Build` command.
     pub fn run(&mut self) -> Result<()> {
-        let process_steps = Build::get_process_steps(self.mode, self.no_pack, self.no_opt, self.crate_data.get_target_triple());
+        let process_steps = Build::get_process_steps(
+            self.mode,
+            self.no_pack,
+            self.no_opt,
+            self.crate_data.get_target_triple(),
+        );
 
         let started = Instant::now();
 
@@ -299,7 +304,7 @@ impl Build {
         mode: InstallMode,
         no_pack: bool,
         no_opt: bool,
-        target_triple: String
+        target_triple: String,
     ) -> Vec<(&'static str, BuildStep)> {
         macro_rules! steps {
             ($($name:ident),+) => {
@@ -330,7 +335,7 @@ impl Build {
                 step_create_dir,
                 step_copy_emscripten_outputs,
             ]);
-        } else {               
+        } else {
             steps.extend(steps![
                 step_build_wasm,
                 step_create_dir,
@@ -378,7 +383,12 @@ impl Build {
 
     fn step_build_wasm(&mut self) -> Result<()> {
         info!("Building wasm...");
-        build::cargo_build_wasm(&self.crate_path, self.profile.clone(), self.crate_data.get_target_triple(), &self.extra_options)?;
+        build::cargo_build_wasm(
+            &self.crate_path,
+            self.profile.clone(),
+            self.crate_data.get_target_triple(),
+            &self.extra_options,
+        )?;
 
         info!(
             "wasm built at {:#?}.",
@@ -476,7 +486,9 @@ impl Build {
             BuildProfile::Custom(profile_name) => &profile_name.clone(),
         };
 
-        let wasm_path = self.crate_data.target_directory()
+        let wasm_path = self
+            .crate_data
+            .target_directory()
             .join(self.crate_data.get_target_triple())
             .join(profile_name)
             .join(self.crate_data.crate_name());

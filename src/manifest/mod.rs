@@ -600,7 +600,8 @@ impl CrateData {
             "crate-type must be cdylib to compile to {}. Add the following to your \
              Cargo.toml file:\n\n\
              [lib]\n\
-             crate-type = [\"cdylib\", \"rlib\"]", &self.target_triple
+             crate-type = [\"cdylib\", \"rlib\"]",
+            &self.target_triple
         )
     }
 

@@ -54,7 +54,11 @@ impl fmt::Display for Wasm32Check {
 /// Ensure that `rustup` has the `wasm32-unknown-unknown` target installed for
 /// current toolchain
 pub fn check_for_wasm32_target(target_triple: String) -> Result<()> {
-    let msg = format!("{}Checking for the Wasm target {}...", emoji::TARGET, target_triple);
+    let msg = format!(
+        "{}Checking for the Wasm target {}...",
+        emoji::TARGET,
+        target_triple
+    );
     PBAR.info(&msg);
 
     // Check if wasm32 target is present, otherwise bail.
@@ -109,17 +113,12 @@ fn does_wasm32_target_libdir_exist(target_triple: String) -> bool {
     match result {
         Ok(wasm32_target_libdir_path) => {
             if wasm32_target_libdir_path.exists() {
-                info!(
-                    "Found {} in {:?}",
-                    target_triple,
-                    wasm32_target_libdir_path
-                );
+                info!("Found {} in {:?}", target_triple, wasm32_target_libdir_path);
                 true
             } else {
                 info!(
                     "Failed to find {} in {:?}",
-                    target_triple,
-                    wasm32_target_libdir_path
+                    target_triple, wasm32_target_libdir_path
                 );
                 false
             }
@@ -168,7 +167,8 @@ fn check_wasm32_target(target_triple: String) -> Result<Wasm32Check> {
 fn rustup_add_wasm_target(target_triple: String) -> Result<()> {
     let mut cmd = Command::new("rustup");
     cmd.arg("target").arg("add").arg(target_triple.clone());
-    child::run(cmd, "rustup").context(format!("Adding the {} target with rustup", target_triple))?;
+    child::run(cmd, "rustup")
+        .context(format!("Adding the {} target with rustup", target_triple))?;
 
     Ok(())
 }
