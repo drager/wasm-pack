@@ -41,6 +41,7 @@ pub struct Build {
     pub bindgen: Option<install::Status>,
     pub cache: Cache,
     pub extra_options: Vec<String>,
+    pub private: bool,
 }
 
 /// What sort of output we're going to be generating and flags we're invoking
@@ -184,6 +185,10 @@ pub struct BuildOptions {
 
     /// List of extra options to pass to `cargo build`
     pub extra_options: Vec<String>,
+
+    #[clap(long)]
+    /// Whether the generated package.json should be marked as private
+    pub private: bool,
 }
 
 impl Default for BuildOptions {
@@ -206,6 +211,7 @@ impl Default for BuildOptions {
             out_dir: String::new(),
             out_name: None,
             extra_options: Vec::new(),
+            private: false,
         }
     }
 }
@@ -260,6 +266,7 @@ impl Build {
             bindgen: None,
             cache: cache::get_wasm_pack_cache()?,
             extra_options: build_opts.extra_options,
+            private: build_opts.private,
         })
     }
 
@@ -394,6 +401,7 @@ impl Build {
             &self.scope,
             self.disable_dts,
             self.target,
+            self.private,
         )?;
         info!(
             "Wrote a package.json at {:#?}.",
