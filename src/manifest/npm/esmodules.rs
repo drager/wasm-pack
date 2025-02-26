@@ -5,6 +5,8 @@ use crate::manifest::npm::repository::Repository;
 #[derive(Serialize)]
 pub struct ESModulesPackage {
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub private: Option<bool>,
     #[serde(rename = "type")]
     pub ty: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
