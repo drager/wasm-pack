@@ -16,6 +16,7 @@ use self::npm::{
     repository::Repository, CommonJSPackage, ESModulesPackage, NoModulesPackage, NpmPackage,
 };
 use crate::command::build::{BuildProfile, Target};
+use crate::emoji::PACKAGE;
 use crate::PBAR;
 use cargo_metadata::Metadata;
 use chrono::offset;
@@ -621,6 +622,7 @@ impl CrateData {
         &self,
         out_dir: &Path,
         scope: &Option<String>,
+        package_name: &Option<String>,
         disable_dts: bool,
         target: Target,
     ) -> Result<()> {
@@ -636,10 +638,16 @@ impl CrateData {
             None
         };
         let npm_data = match target {
-            Target::Nodejs => self.to_commonjs(scope, disable_dts, existing_deps, out_dir),
-            Target::NoModules => self.to_nomodules(scope, disable_dts, existing_deps, out_dir),
-            Target::Bundler => self.to_esmodules(scope, disable_dts, existing_deps, out_dir),
-            Target::Web => self.to_web(scope, disable_dts, existing_deps, out_dir),
+            Target::Nodejs => {
+                self.to_commonjs(scope, package_name, disable_dts, existing_deps, out_dir)
+            }
+            Target::NoModules => {
+                self.to_nomodules(scope, package_name, disable_dts, existing_deps, out_dir)
+            }
+            Target::Bundler => {
+                self.to_esmodules(scope, package_name, disable_dts, existing_deps, out_dir)
+            }
+            Target::Web => self.to_web(scope, package_name, disable_dts, existing_deps, out_dir),
             // Deno does not need package.json
             Target::Deno => return Ok(()),
         };
@@ -654,6 +662,7 @@ impl CrateData {
     fn npm_data(
         &self,
         scope: &Option<String>,
+        package_name: &Option<String>,
         add_js_bg_to_package_json: bool,
         disable_dts: bool,
         out_dir: &Path,
@@ -670,9 +679,11 @@ impl CrateData {
         }
 
         let pkg = &self.data.packages[self.current_idx];
-        let npm_name = match scope {
-            Some(s) => format!("@{}/{}", s, pkg.name),
-            None => pkg.name.clone(),
+        let npm_name = match (scope, package_name) {
+            (Some(s), Some(name)) => format!("@{}/{}", s, name),
+            (Some(s), None) => format!("@{}/{}", s, pkg.name.clone()),
+            (None, Some(name)) => name.clone(),
+            (None, None) => pkg.name.clone(),
         };
 
         let dts_file = if !disable_dts {
@@ -723,11 +734,12 @@ impl CrateData {
     fn to_commonjs(
         &self,
         scope: &Option<String>,
+        package_name: &Option<String>,
         disable_dts: bool,
         dependencies: Option<HashMap<String, String>>,
         out_dir: &Path,
     ) -> NpmPackage {
-        let data = self.npm_data(scope, false, disable_dts, out_dir);
+        let data = self.npm_data(scope, package_name, false, disable_dts, out_dir);
         let pkg = &self.data.packages[self.current_idx];
 
         self.check_optional_fields();
@@ -754,11 +766,12 @@ impl CrateData {
     fn to_esmodules(
         &self,
         scope: &Option<String>,
+        package_name: &Option<String>,
         disable_dts: bool,
         dependencies: Option<HashMap<String, String>>,
         out_dir: &Path,
     ) -> NpmPackage {
-        let data = self.npm_data(scope, true, disable_dts, out_dir);
+        let data = self.npm_data(scope, package_name, true, disable_dts, out_dir);
         let pkg = &self.data.packages[self.current_idx];
 
         self.check_optional_fields();
@@ -787,11 +800,12 @@ impl CrateData {
     fn to_web(
         &self,
         scope: &Option<String>,
+        package_name: &Option<String>,
         disable_dts: bool,
         dependencies: Option<HashMap<String, String>>,
         out_dir: &Path,
     ) -> NpmPackage {
-        let data = self.npm_data(scope, false, disable_dts, out_dir);
+        let data = self.npm_data(scope, package_name, false, disable_dts, out_dir);
         let pkg = &self.data.packages[self.current_idx];
 
         self.check_optional_fields();
@@ -820,11 +834,12 @@ impl CrateData {
     fn to_nomodules(
         &self,
         scope: &Option<String>,
+        package_name: &Option<String>,
         disable_dts: bool,
         dependencies: Option<HashMap<String, String>>,
         out_dir: &Path,
     ) -> NpmPackage {
-        let data = self.npm_data(scope, false, disable_dts, out_dir);
+        let data = self.npm_data(scope, package_name, false, disable_dts, out_dir);
         let pkg = &self.data.packages[self.current_idx];
 
         self.check_optional_fields();

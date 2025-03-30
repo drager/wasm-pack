@@ -28,6 +28,7 @@ pub struct Build {
     pub crate_path: PathBuf,
     pub crate_data: manifest::CrateData,
     pub scope: Option<String>,
+    pub package_name: Option<String>,
     pub disable_dts: bool,
     pub weak_refs: bool,
     pub reference_types: bool,
@@ -124,6 +125,10 @@ pub struct BuildOptions {
     #[clap(long = "scope", short = 's')]
     pub scope: Option<String>,
 
+    /// The npm package name to use in package.json, if any.
+    #[clap(long = "package-name", short = 'p')]
+    pub package_name: Option<String>,
+
     #[clap(long = "mode", short = 'm', default_value = "normal")]
     /// Sets steps to be run. [possible values: no-install, normal, force]
     pub mode: InstallMode,
@@ -191,6 +196,7 @@ impl Default for BuildOptions {
         Self {
             path: None,
             scope: None,
+            package_name: None,
             mode: InstallMode::default(),
             disable_dts: false,
             weak_refs: false,
@@ -247,6 +253,7 @@ impl Build {
             crate_path,
             crate_data,
             scope: build_opts.scope,
+            package_name: build_opts.package_name,
             disable_dts: build_opts.disable_dts,
             weak_refs: build_opts.weak_refs,
             reference_types: build_opts.reference_types,
@@ -392,6 +399,7 @@ impl Build {
         self.crate_data.write_package_json(
             &self.out_dir,
             &self.scope,
+            &self.package_name,
             self.disable_dts,
             self.target,
         )?;
