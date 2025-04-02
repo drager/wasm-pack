@@ -3,8 +3,8 @@
 `wasm-pack` can be configured via the `package.metadata.wasm-pack` key in
 `Cargo.toml`. Every option has a default, and is not required.
 
-There are three profiles: `dev`, `profiling`, and `release`. These correspond to
-the `--dev`, `--profiling`, and `--release` flags passed to `wasm-pack build`.
+There are three built-in profiles: `dev`, `profiling`, and `release`. These correspond to
+the `--dev`, `--profiling`, and `--release` flags passed to `wasm-pack build`. `wasm_pack` can also be invoked with the `--profile [some custom profile]` option to use a custom profile name. This will also pass that profile to the cargo invocation.
 
 The available configuration options and their default values are shown below:
 
@@ -44,6 +44,7 @@ debug-js-glue = false
 demangle-name-section = true
 dwarf-debug-info = false
 omit-default-module-path = false
+split_linked_modules = false
 
 # `wasm-opt` is on by default in for the release profile, but it can be
 # disabled by setting it to `false`
@@ -55,4 +56,16 @@ debug-js-glue = false
 demangle-name-section = true
 dwarf-debug-info = false
 omit-default-module-path = false
+split_linked_modules = false
+
+# `custom_profile_name` can be anything and must match the value in the `--profile` option when invoking `wasm-pack`.
+[package.metadata.wasm-pack.profile.custom_profile_name]
+wasm-opt = ['-O']
+
+[package.metadata.wasm-pack.profile.custom_profile_name.wasm-bindgen]
+debug-js-glue = false
+demangle-name-section = true
+dwarf-debug-info = false
+omit-default-module-path = false
+split_linked_modules = false
 ```

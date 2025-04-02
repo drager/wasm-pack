@@ -552,9 +552,9 @@ fn parse_crate_data_returns_unused_keys_in_cargo_toml() {
             [dependencies]
             wasm-bindgen = "0.2"
 
-            # Note: production is not valid.
-            [package.metadata.wasm-pack.profile.production.wasm-bindgen]
-            debug-js-glue = true
+            # Note: underscore instead of hyphen is not valid.
+            [package.metadata.wasm-pack.profile.release.wasm-bindgen]
+            debug_js_glue = true
             "#,
         )
         .hello_world_src_lib()
@@ -565,7 +565,7 @@ fn parse_crate_data_returns_unused_keys_in_cargo_toml() {
         .assert()
         .success()
         .stderr(predicates::str::contains(format!(
-        "[WARN]: {} \"package.metadata.wasm-pack.profile.production\" is an unknown key and will \
+        "[WARN]: {} \"package.metadata.wasm-pack.profile.release.wasm-bindgen.debug_js_glue\" is an unknown key and will \
          be ignored. Please check your Cargo.toml.",
         emoji::WARN
     )));

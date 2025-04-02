@@ -60,53 +60,81 @@ struct CargoMetadata {
     wasm_pack: CargoWasmPack,
 }
 
-#[derive(Default, Deserialize)]
-struct CargoWasmPack {
-    #[serde(default)]
-    profile: CargoWasmPackProfiles,
-}
-
 #[derive(Deserialize)]
-struct CargoWasmPackProfiles {
-    #[serde(
-        default = "CargoWasmPackProfile::default_dev",
-        deserialize_with = "CargoWasmPackProfile::deserialize_dev"
-    )]
-    dev: CargoWasmPackProfile,
-
-    #[serde(
-        default = "CargoWasmPackProfile::default_release",
-        deserialize_with = "CargoWasmPackProfile::deserialize_release"
-    )]
-    release: CargoWasmPackProfile,
-
-    #[serde(
-        default = "CargoWasmPackProfile::default_profiling",
-        deserialize_with = "CargoWasmPackProfile::deserialize_profiling"
-    )]
-    profiling: CargoWasmPackProfile,
-
-    #[serde(
-        default = "CargoWasmPackProfile::default_custom",
-        deserialize_with = "CargoWasmPackProfile::deserialize_custom"
-    )]
-    custom: CargoWasmPackProfile,
+struct CargoWasmPack {
+    #[serde(default, deserialize_with = "CargoWasmPack::deserialize_profiles")]
+    profile: HashMap<String, CargoWasmPackProfile>,
 }
 
-impl Default for CargoWasmPackProfiles {
-    fn default() -> CargoWasmPackProfiles {
-        CargoWasmPackProfiles {
-            dev: CargoWasmPackProfile::default_dev(),
-            release: CargoWasmPackProfile::default_release(),
-            profiling: CargoWasmPackProfile::default_profiling(),
-            custom: CargoWasmPackProfile::default_custom(),
+impl Default for CargoWasmPack {
+    fn default() -> Self {
+        let mut profile = HashMap::new();
+        profile.insert("dev".to_owned(), CargoWasmPackProfile::default_dev());
+        profile.insert(
+            "release".to_owned(),
+            CargoWasmPackProfile::default_release(),
+        );
+        profile.insert(
+            "profiling".to_owned(),
+            CargoWasmPackProfile::default_profiling(),
+        );
+        profile.insert("custom".to_owned(), CargoWasmPackProfile::default_custom());
+        CargoWasmPack { profile }
+    }
+}
+
+impl CargoWasmPack {
+    fn deserialize_profiles<'de, D>(
+        deserializer: D,
+    ) -> Result<HashMap<String, CargoWasmPackProfile>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let mut profiles = <HashMap<String, CargoWasmPackProfile>>::deserialize(deserializer)?;
+        let found_deprecated_custom = profiles.contains_key("custom");
+        if found_deprecated_custom {
+            PBAR.warn(
+                "The `custom` profile is deprecated. Please use the name of the current profile instead.",
+            );
         }
+
+        profiles
+            .entry("dev".to_owned())
+            .or_default()
+            .update_with_defaults(&CargoWasmPackProfile::default_dev());
+        profiles
+            .entry("release".to_owned())
+            .or_default()
+            .update_with_defaults(&CargoWasmPackProfile::default_release());
+        profiles
+            .entry("profiling".to_owned())
+            .or_default()
+            .update_with_defaults(&CargoWasmPackProfile::default_profiling());
+        profiles
+            .entry("custom".to_owned())
+            .or_default()
+            .update_with_defaults(&CargoWasmPackProfile::default_custom());
+
+        for (profile_name, profile) in profiles.iter_mut() {
+            if !matches!(
+                profile_name.as_str(),
+                "dev" | "release" | "profiling" | "custom"
+            ) {
+                if found_deprecated_custom {
+                    PBAR.warn(&format!(
+                        "Since the `{profile_name}` profile was explicitly defined, the values provided in the `custom` profile will not be used."
+                    ));
+                }
+                profile.update_with_defaults(&CargoWasmPackProfile::default_custom());
+            };
+        }
+        Ok(profiles)
     }
 }
 
 /// This is where configuration goes for wasm-bindgen, wasm-opt, wasm-snip, or
 /// anything else that wasm-pack runs.
-#[derive(Default, Deserialize)]
+#[derive(Clone, Default, Deserialize)]
 pub struct CargoWasmPackProfile {
     #[serde(default, rename = "wasm-bindgen")]
     wasm_bindgen: CargoWasmPackProfileWasmBindgen,
@@ -114,7 +142,7 @@ pub struct CargoWasmPackProfile {
     wasm_opt: Option<CargoWasmPackProfileWasmOpt>,
 }
 
-#[derive(Default, Deserialize)]
+#[derive(Clone, Default, Deserialize)]
 struct CargoWasmPackProfileWasmBindgen {
     #[serde(default, rename = "debug-js-glue")]
     debug_js_glue: Option<bool>,
@@ -331,42 +359,6 @@ impl CargoWasmPackProfile {
         }
     }
 
-    fn deserialize_dev<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let mut profile = <Option<Self>>::deserialize(deserializer)?.unwrap_or_default();
-        profile.update_with_defaults(&Self::default_dev());
-        Ok(profile)
-    }
-
-    fn deserialize_release<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let mut profile = <Option<Self>>::deserialize(deserializer)?.unwrap_or_default();
-        profile.update_with_defaults(&Self::default_release());
-        Ok(profile)
-    }
-
-    fn deserialize_profiling<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let mut profile = <Option<Self>>::deserialize(deserializer)?.unwrap_or_default();
-        profile.update_with_defaults(&Self::default_profiling());
-        Ok(profile)
-    }
-
-    fn deserialize_custom<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let mut profile = <Option<Self>>::deserialize(deserializer)?.unwrap_or_default();
-        profile.update_with_defaults(&Self::default_custom());
-        Ok(profile)
-    }
-
     fn update_with_defaults(&mut self, defaults: &Self) {
         macro_rules! d {
             ( $( $path:ident ).* ) => {
@@ -527,12 +519,27 @@ impl CrateData {
 
     /// Get the configured profile.
     pub fn configured_profile(&self, profile: BuildProfile) -> &CargoWasmPackProfile {
-        match profile {
-            BuildProfile::Dev => &self.manifest.package.metadata.wasm_pack.profile.dev,
-            BuildProfile::Profiling => &self.manifest.package.metadata.wasm_pack.profile.profiling,
-            BuildProfile::Release => &self.manifest.package.metadata.wasm_pack.profile.release,
-            BuildProfile::Custom(_) => &self.manifest.package.metadata.wasm_pack.profile.custom,
-        }
+        let profile_name = match profile {
+            BuildProfile::Dev => "dev",
+            BuildProfile::Profiling => "profiling",
+            BuildProfile::Release => "release",
+            BuildProfile::Custom(ref name) => name,
+        };
+        self.manifest
+            .package
+            .metadata
+            .wasm_pack
+            .profile
+            .get(profile_name)
+            .or_else(|| {
+                self.manifest
+                    .package
+                    .metadata
+                    .wasm_pack
+                    .profile
+                    .get("custom")
+            })
+            .unwrap()
     }
 
     /// Check that the crate the given path is properly configured.
