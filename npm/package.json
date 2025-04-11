@@ -29,7 +29,9 @@
   },
   "homepage": "https://github.com/rustwasm/wasm-pack#readme",
   "dependencies": {
-    "axios": "^0.30.0",
-    "binary-install": "^1.0.1"
+    "binary-install": "^1.1.0"
+  },
+  "resolutions": {
+    "axios": "^0.30.0"
   }
 }
