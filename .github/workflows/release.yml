@@ -13,6 +13,7 @@ env:
   MACOS_TARGET: x86_64-apple-darwin
   LINUX_AMD64_TARGET: x86_64-unknown-linux-musl
   LINUX_ARM64_TARGET: aarch64-unknown-linux-musl
+  LINUX_S390X_TARGET: s390x-unknown-linux-musl
 
   # Space separated paths to include in the archive.
   RELEASE_ADDS: README.md LICENSE-APACHE LICENSE-MIT
@@ -32,6 +33,9 @@ jobs:
             rust: stable
           - target: x86_64-apple-darwin
             os: macos-latest
+            rust: stable
+          - target: s390x-unknown-linux-musl
+            os: ubuntu-latest
             rust: stable
           - target: x86_64-pc-windows-msvc
             os: windows-latest
@@ -55,7 +59,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update -y
-          sudo apt-get install clang gcc-aarch64-linux-gnu musl-tools -y
+          sudo apt-get install clang gcc-aarch64-linux-gnu gcc-s390x-linux-gnu musl-tools -y
 
       - name: Install p7zip (MacOS)
         if: matrix.os == 'macos-latest'
@@ -136,6 +140,11 @@ jobs:
         with:
           name: ${{ env.LINUX_ARM64_TARGET }}
 
+      - name: Download Linux s390x tarball
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ env.LINUX_S390X_TARGET }}
+
       - name: Download Windows tarball
         uses: actions/download-artifact@v4.1.7
         with:
@@ -165,6 +174,17 @@ jobs:
           asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.LINUX_ARM64_TARGET }}.tar.gz
           asset_content_type: application/gzip
           asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.LINUX_ARM64_TARGET }}.tar.gz
+
+
+      - name: Release Linux s390x tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.LINUX_S390X_TARGET }}.tar.gz
+          asset_content_type: application/gzip
+          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.LINUX_S390X_TARGET }}.tar.gz
 
       - name: Release Windows tarball
         uses: actions/upload-release-asset@v1
