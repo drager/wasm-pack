@@ -175,7 +175,6 @@ jobs:
           asset_content_type: application/gzip
           asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.LINUX_ARM64_TARGET }}.tar.gz
 
-
       - name: Release Linux s390x tarball
         uses: actions/upload-release-asset@v1
         env:
