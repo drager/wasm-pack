@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - add-s390x-support
   pull_request:
     branches:
       - master
