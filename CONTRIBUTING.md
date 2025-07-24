@@ -71,6 +71,15 @@ For help setting up a global .gitignore check out this [GitHub article]!
 
 [GitHub article]: https://help.github.com/articles/ignoring-files/#create-a-global-gitignore
 
+## Running tests
+
+Some of this project's tests run in the browser with webdriver. macOS users
+may need to first run:
+
+```
+safaridriver --enable
+```
+
 ## Conduct
 
 As mentioned in the readme file, this project is a part of the [`rust-wasm` working group],

@@ -60,7 +60,7 @@ fn it_copies_a_readme_provided_path() {
             # bindgen downloaded is what we expect, and if `=` is
             # removed then it will download whatever the newest version
             # of wasm-bindgen is which may not be what's listed here.
-            wasm-bindgen = "=0.2.74"
+            wasm-bindgen = "=0.2.95"
 
             [dev-dependencies]
             wasm-bindgen-test = "0.3"
@@ -120,7 +120,7 @@ fn it_ignores_a_disabled_readme() {
             # bindgen downloaded is what we expect, and if `=` is
             # removed then it will download whatever the newest version
             # of wasm-bindgen is which may not be what's listed here.
-            wasm-bindgen = "=0.2.74"
+            wasm-bindgen = "=0.2.95"
 
             [dev-dependencies]
             wasm-bindgen-test = "0.3"
