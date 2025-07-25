@@ -163,13 +163,13 @@ impl Fixture {
     pub fn cargo_toml_with_custom_profile(&self, name: &str, profile_name: &str) -> &Self {
         self.file(
             "Cargo.toml",
-            &format!(
+            format!(
                 r#"
                     [package]
                     authors = ["The wasm-pack developers"]
                     description = "so awesome rust+wasm package"
                     license = "WTFPL"
-                    name = "{}"
+                    name = "{name}"
                     repository = "https://github.com/rustwasm/wasm-pack.git"
                     version = "0.1.0"
 
@@ -187,12 +187,14 @@ impl Fixture {
                     [dev-dependencies]
                     wasm-bindgen-test = "0.3"
 
-                    [profile.{}]
+                    [profile.{profile_name}]
                     inherits = "release"
                     opt-level = 'z'
                     lto = true
-                "#,
-                name, profile_name
+
+                    [package.metadata.wasm-pack.profile.{profile_name}]
+                    wasm-opt = ["-Oz"]
+                "#
             ),
         )
     }
