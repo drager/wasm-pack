@@ -429,7 +429,7 @@ struct NpmData {
 }
 
 #[doc(hidden)]
-pub struct ManifestAndUnsedKeys {
+pub struct ManifestAndUnusedKeys {
     pub manifest: CargoManifest,
     pub unused_keys: BTreeSet<String>,
 }
@@ -482,13 +482,13 @@ impl CrateData {
     }
 
     /// Read the `manifest_path` file and deserializes it using the toml Deserializer.
-    /// Returns a Result containing `ManifestAndUnsedKeys` which contains `CargoManifest`
+    /// Returns a Result containing `ManifestAndUnusedKeys` which contains `CargoManifest`
     /// and a `BTreeSet<String>` containing the unused keys from the parsed file.
     ///
     /// # Errors
     /// Will return Err if the file (manifest_path) couldn't be read or
     /// if deserialize to `CargoManifest` fails.
-    pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnsedKeys> {
+    pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnusedKeys> {
         let manifest = fs::read_to_string(&manifest_path)
             .with_context(|| anyhow!("failed to read: {}", manifest_path.display()))?;
         let manifest = toml::Deserializer::new(&manifest);
@@ -508,7 +508,7 @@ impl CrateData {
         })
         .with_context(|| anyhow!("failed to parse manifest: {}", manifest_path.display()))?;
 
-        Ok(ManifestAndUnsedKeys {
+        Ok(ManifestAndUnusedKeys {
             manifest,
             unused_keys,
         })
@@ -516,7 +516,7 @@ impl CrateData {
 
     /// Iterating through all the passed `unused_keys` and output
     /// a warning for each unknown key.
-    pub fn warn_for_unused_keys(manifest_and_keys: &ManifestAndUnsedKeys) {
+    pub fn warn_for_unused_keys(manifest_and_keys: &ManifestAndUnusedKeys) {
         manifest_and_keys.unused_keys.iter().for_each(|path| {
             PBAR.warn(&format!(
                 "\"{}\" is an unknown key and will be ignored. Please check your Cargo.toml.",
