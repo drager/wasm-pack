@@ -9,7 +9,7 @@ It takes 3 parameters, name, template, and mode:
 wasm-pack new <name> --template <template> --mode <normal|noinstall|force>
 ```
 
-The default template is [`rustwasm/wasm-pack-template`](https://github.com/rustwasm/wasm-pack-template).
+The default template is [`rustwasm/wasm-pack-template`](https://github.com/drager/wasm-pack-template).
 
 ## Name
 
@@ -24,7 +24,7 @@ wasm-pack new myproject
 The `wasm-pack new` command can be given an optional template argument, e.g.:
 
 ```
-wasm-pack new myproject --template https://github.com/rustwasm/wasm-pack-template
+wasm-pack new myproject --template https://github.com/drager/wasm-pack-template
 ```
 
 The template can be an address to a git repo that contains a [`cargo-generate`]

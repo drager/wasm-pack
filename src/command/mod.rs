@@ -48,7 +48,7 @@ pub enum Command {
         /// The URL to the template
         #[clap(
             long = "template",
-            default_value = "https://github.com/rustwasm/wasm-pack-template"
+            default_value = "https://github.com/drager/wasm-pack-template"
         )]
         template: String,
         #[clap(long = "mode", short = 'm', default_value = "normal")]

@@ -78,7 +78,7 @@ pub struct TestOptions {
     /// If the path is not provided, this command searches up the path from the current directory.
     ///
     /// This is a workaround to allow wasm pack to provide the same command line interface as `cargo`.
-    /// See <https://github.com/rustwasm/wasm-pack/pull/851> for more information.
+    /// See <https://github.com/drager/wasm-pack/pull/851> for more information.
     pub path_and_extra_options: Vec<String>,
 }
 

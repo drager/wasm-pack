@@ -174,7 +174,7 @@ fn complains_about_missing_wasm_bindgen_test_dependency() {
                 description = "so awesome rust+wasm package"
                 license = "WTFPL"
                 name = "missing-wbg-test"
-                repository = "https://github.com/rustwasm/wasm-pack.git"
+                repository = "https://github.com/drager/wasm-pack.git"
                 version = "0.1.0"
 
                 [lib]

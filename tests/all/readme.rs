@@ -48,7 +48,7 @@ fn it_copies_a_readme_provided_path() {
             license = "WTFPL"
             name = "js-hello-world"
             readme = "docs/README.md"
-            repository = "https://github.com/rustwasm/wasm-pack.git"
+            repository = "https://github.com/drager/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -108,7 +108,7 @@ fn it_ignores_a_disabled_readme() {
             description = "so awesome rust+wasm package"
             name = "js-hello-world"
             readme = false
-            repository = "https://github.com/rustwasm/wasm-pack.git"
+            repository = "https://github.com/drager/wasm-pack.git"
             version = "0.1.0"
 
             [lib]

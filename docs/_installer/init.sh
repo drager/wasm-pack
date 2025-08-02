@@ -53,7 +53,7 @@ case "$VERSION" in
     *) VERSION="v$VERSION" ;;
 esac
 
-UPDATE_ROOT="https://github.com/rustwasm/wasm-pack/releases/download/$VERSION"
+UPDATE_ROOT="https://github.com/drager/wasm-pack/releases/download/$VERSION"
 
 main() {
     downloader --check
@@ -173,7 +173,7 @@ get_architecture() {
 
     esac
 
-    # See https://github.com/rustwasm/wasm-pack/pull/1088
+    # See https://github.com/drager/wasm-pack/pull/1088
     if [ "$_cputype" = "aarch64" ] && [ "$_ostype" = "apple-darwin" ]; then
         _cputype="x86_64"
     fi

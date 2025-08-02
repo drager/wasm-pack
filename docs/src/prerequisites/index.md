@@ -3,7 +3,7 @@
 First you'll want to [install the `wasm-pack` CLI][wasm-pack], and `wasm-pack
 -V` should print the version that you just installed.
 
-[wasm-pack]: https://rustwasm.github.io/wasm-pack/installer/
+[wasm-pack]: https://drager.github.io/wasm-pack/installer/
 
 Next, since `wasm-pack` is a build tool, you'll want to make sure you have
 [Rust][rust] installed. Make sure `rustc -V` prints out at least 1.30.0.

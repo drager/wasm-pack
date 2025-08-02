@@ -113,7 +113,7 @@ pub fn get_cli_version(tool: &Tool, path: &Path) -> Result<String> {
     let version = stdout.trim().split_whitespace().nth(1);
     match version {
         Some(v) => Ok(v.to_string()),
-        None => bail!("Something went wrong! We couldn't determine your version of the wasm-bindgen CLI. We were supposed to set that up for you, so it's likely not your fault! You should file an issue: https://github.com/rustwasm/wasm-pack/issues/new?template=bug_report.md.")
+        None => bail!("Something went wrong! We couldn't determine your version of the wasm-bindgen CLI. We were supposed to set that up for you, so it's likely not your fault! You should file an issue: https://github.com/drager/wasm-pack/issues/new?template=bug_report.md.")
     }
 }
 

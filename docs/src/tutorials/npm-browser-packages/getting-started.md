@@ -11,14 +11,14 @@ cargo install cargo-generate
 Then run:
 
 ```
-cargo generate --git https://github.com/rustwasm/wasm-pack-template
+cargo generate --git https://github.com/drager/wasm-pack-template
 ```
 
 You will be prompted to give your project a name. Once you do, you will have a directory
 with a new project, ready to go. We'll talk about what's been included in this template
 further in this guide.
 
-[rustwasm wasm-pack-template]: https://github.com/rustwasm/wasm-pack-template
+[rustwasm wasm-pack-template]: https://github.com/drager/wasm-pack-template
 
 ## Manual Setup
 

@@ -30,7 +30,7 @@ use toml;
 
 const WASM_PACK_METADATA_KEY: &str = "package.metadata.wasm-pack";
 const WASM_PACK_VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
-const WASM_PACK_REPO_URL: &str = "https://github.com/rustwasm/wasm-pack";
+const WASM_PACK_REPO_URL: &str = "https://github.com/drager/wasm-pack";
 
 /// Store for metadata learned about a crate
 pub struct CrateData {

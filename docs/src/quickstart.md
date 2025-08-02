@@ -11,4 +11,4 @@
    registry you want to publish to. You can login using `wasm-pack login`.
 
 [`rustup`]: https://rustup.rs/
-[Install this tool.]: https://rustwasm.github.io/wasm-pack/installer/
+[Install this tool.]: https://drager.github.io/wasm-pack/installer/

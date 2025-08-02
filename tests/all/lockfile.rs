@@ -39,7 +39,7 @@ fn it_gets_wasm_bindgen_version_in_crate_inside_workspace() {
                 description = "so awesome rust+wasm package"
                 license = "WTFPL"
                 name = "blah"
-                repository = "https://github.com/rustwasm/wasm-pack.git"
+                repository = "https://github.com/drager/wasm-pack.git"
                 version = "0.1.0"
 
                 [lib]
@@ -84,7 +84,7 @@ fn it_gets_wasm_bindgen_version_from_dependencies() {
                 description = "so awesome rust+wasm package"
                 license = "WTFPL"
                 name = "child"
-                repository = "https://github.com/rustwasm/wasm-pack.git"
+                repository = "https://github.com/drager/wasm-pack.git"
                 version = "0.1.0"
 
                 [lib]
@@ -112,7 +112,7 @@ fn it_gets_wasm_bindgen_version_from_dependencies() {
                 description = "so awesome rust+wasm package"
                 license = "WTFPL"
                 name = "parent"
-                repository = "https://github.com/rustwasm/wasm-pack.git"
+                repository = "https://github.com/drager/wasm-pack.git"
                 version = "0.1.0"
 
                 [lib]

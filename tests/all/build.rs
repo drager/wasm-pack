@@ -70,7 +70,7 @@ fn it_should_build_crates_in_a_workspace() {
                 description = "so awesome rust+wasm package"
                 license = "WTFPL"
                 name = "blah"
-                repository = "https://github.com/rustwasm/wasm-pack.git"
+                repository = "https://github.com/drager/wasm-pack.git"
                 version = "0.1.0"
 
                 [lib]
@@ -242,7 +242,7 @@ fn build_with_and_without_wasm_bindgen_debug() {
                     description = "so awesome rust+wasm package"
                     license = "WTFPL"
                     name = "whatever"
-                    repository = "https://github.com/rustwasm/wasm-pack.git"
+                    repository = "https://github.com/drager/wasm-pack.git"
                     version = "0.1.0"
 
                     [lib]
@@ -367,7 +367,7 @@ fn build_crates_with_same_names() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "somename"
-            repository = "https://github.com/rustwasm/wasm-pack.git"
+            repository = "https://github.com/drager/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -397,7 +397,7 @@ fn build_crates_with_same_names() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "somename"
-            repository = "https://github.com/rustwasm/wasm-pack.git"
+            repository = "https://github.com/drager/wasm-pack.git"
             version = "0.1.1"
 
             [lib]

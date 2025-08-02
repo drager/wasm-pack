@@ -1,4 +1,4 @@
-![wasm ferris](https://rustwasm.github.io/wasm-pack/public/img/wasm-ferris.png)
+![wasm ferris](https://drager.github.io/wasm-pack/public/img/wasm-ferris.png)
 
 <h1 style="text-align: center;">Welcome to the <code>wasm-pack</code> docs!</h1>
 
@@ -16,4 +16,4 @@ visiting that repo!
 
 [rust-wasm]: https://github.com/rustwasm/team
 
-![demo](https://github.com/rustwasm/wasm-pack/raw/master/demo.gif)
+![demo](https://github.com/drager/wasm-pack/raw/master/demo.gif)

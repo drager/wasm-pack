@@ -92,7 +92,7 @@ fn run() -> Result<()> {
         match wasm_pack_version {
             Ok(wasm_pack_version) =>
                 PBAR.warn(&format!("There's a newer version of wasm-pack available, the new version is: {}, you are using: {}. \
-                To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/", wasm_pack_version.latest, wasm_pack_version.local)),
+                To update, navigate to: https://drager.github.io/wasm-pack/installer/", wasm_pack_version.latest, wasm_pack_version.local)),
             Err(err) => PBAR.warn(&format!("{}", err))
         }
     }

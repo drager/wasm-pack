@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rustwasm/wasm-pack.git"
+    "url": "git+https://github.com/drager/wasm-pack.git"
   },
   "keywords": [
     "wasm",
@@ -25,9 +25,9 @@
   "author": "Jesper Håkansson <jesper@jesperh.se>",
   "license": "MIT OR Apache-2.0",
   "bugs": {
-    "url": "https://github.com/rustwasm/wasm-pack/issues"
+    "url": "https://github.com/drager/wasm-pack/issues"
   },
-  "homepage": "https://github.com/rustwasm/wasm-pack#readme",
+  "homepage": "https://github.com/drager/wasm-pack#readme",
   "dependencies": {
     "binary-install": "^1.0.1"
   }

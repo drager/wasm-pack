@@ -25,7 +25,7 @@ impl fmt::Display for Wasm32Check {
             let rustup_string = if self.is_rustup {
                 "It looks like Rustup is being used.".to_owned()
             } else {
-                format!("It looks like Rustup is not being used. For non-Rustup setups, the {} target needs to be installed manually. See https://rustwasm.github.io/wasm-pack/book/prerequisites/non-rustup-setups.html on how to do this.", target)
+                format!("It looks like Rustup is not being used. For non-Rustup setups, the {} target needs to be installed manually. See https://drager.github.io/wasm-pack/book/prerequisites/non-rustup-setups.html on how to do this.", target)
             };
 
             writeln!(
