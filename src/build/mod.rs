@@ -72,10 +72,11 @@ fn wasm_pack_local_version() -> Option<String> {
     Some(output.to_string())
 }
 
-/// Run `cargo build` targetting `wasm32-unknown-unknown`.
+/// Run `cargo build` targetting WebAssembly.
 pub fn cargo_build_wasm(
     path: &Path,
     profile: BuildProfile,
+    target_triple: String,
     extra_options: &[String],
 ) -> Result<()> {
     let msg = format!("{}Compiling to Wasm...", emoji::CYCLONE);
@@ -109,7 +110,7 @@ pub fn cargo_build_wasm(
         }
     }
 
-    cmd.arg("--target").arg("wasm32-unknown-unknown");
+    cmd.arg("--target").arg(target_triple);
 
     // The `cargo` command is executed inside the directory at `path`, so relative paths set via extra options won't work.
     // To remedy the situation, all detected paths are converted to absolute paths.
