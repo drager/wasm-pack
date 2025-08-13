@@ -10,7 +10,8 @@ env:
   RELEASE_DIR: artifacts
   GITHUB_REF: '${{ github.ref }}'
   WINDOWS_TARGET: x86_64-pc-windows-msvc
-  MACOS_TARGET: x86_64-apple-darwin
+  MACOS_AMD64_TARGET: x86_64-apple-darwin
+  MACOS_ARM64_TARGET: aarch64-apple-darwin
   LINUX_AMD64_TARGET: x86_64-unknown-linux-musl
   LINUX_ARM64_TARGET: aarch64-unknown-linux-musl
 
@@ -31,6 +32,9 @@ jobs:
             os: ubuntu-latest
             rust: stable
           - target: x86_64-apple-darwin
+            os: macos-latest
+            rust: stable
+          - target: aarch64-apple-darwin
             os: macos-latest
             rust: stable
           - target: x86_64-pc-windows-msvc
@@ -141,10 +145,14 @@ jobs:
         with:
           name: ${{ env.WINDOWS_TARGET }}
 
-      - name: Download MacOS tarball
+      - name: Download ARM64 MacOS tarball
         uses: actions/download-artifact@v4.1.7
         with:
-          name: ${{ env.MACOS_TARGET }}
+          name: ${{ env.MACOS_ARM64_TARGET }}
+      - name: Download AMD64 MacOS tarball
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ env.MACOS_AMD64_TARGET }}
 
       - name: Release Linux amd64 tarball
         uses: actions/upload-release-asset@v1
@@ -186,12 +194,21 @@ jobs:
           asset_content_type: application/vnd.microsoft.portable-executable
           asset_name: wasm-pack-init.exe
 
-      - name: Release MacOS tarball
+      - name: Release AMD64 MacOS tarball
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_TARGET }}.tar.gz
+          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_AMD64_TARGET }}.tar.gz
           asset_content_type: application/gzip
-          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_TARGET }}.tar.gz
+          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_AMD64_TARGET }}.tar.gz
+      - name: Release ARM64 MacOS tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM64_TARGET }}.tar.gz
+          asset_content_type: application/gzip
+          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM64_TARGET }}.tar.gz
