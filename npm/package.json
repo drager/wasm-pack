@@ -29,10 +29,6 @@
   },
   "homepage": "https://github.com/drager/wasm-pack#readme",
   "dependencies": {
-    "binary-install": "^1.1.2"
-  },
-  "resolutions": {
-    "tar": "^7.5.3",
-    "axios": "^0.30.0"
+    "simple-binary-install": "0.2.1"
   }
 }
