@@ -284,7 +284,7 @@ impl CargoWasmPackProfile {
             wasm_bindgen: CargoWasmPackProfileWasmBindgen {
                 debug_js_glue: Some(true),
                 demangle_name_section: Some(true),
-                dwarf_debug_info: Some(false),
+                dwarf_debug_info: Some(true),
                 omit_default_module_path: Some(false),
                 split_linked_modules: Some(false),
             },
@@ -323,7 +323,7 @@ impl CargoWasmPackProfile {
             wasm_bindgen: CargoWasmPackProfileWasmBindgen {
                 debug_js_glue: Some(false),
                 demangle_name_section: Some(true),
-                dwarf_debug_info: Some(false),
+                dwarf_debug_info: Some(true), //maybe should read from toml
                 omit_default_module_path: Some(false),
                 split_linked_modules: Some(false),
             },
