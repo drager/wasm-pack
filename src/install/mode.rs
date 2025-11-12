@@ -4,8 +4,10 @@ use std::str::FromStr;
 /// The `InstallMode` determines which mode of initialization we are running, and
 /// what install steps we perform.
 #[derive(Clone, Copy, Debug)]
+#[derive(Default)]
 pub enum InstallMode {
     /// Perform all the install steps.
+    #[default]
     Normal,
     /// Don't install tools like `wasm-bindgen`, just use the global
     /// environment's existing versions to do builds.
@@ -14,11 +16,6 @@ pub enum InstallMode {
     Force,
 }
 
-impl Default for InstallMode {
-    fn default() -> InstallMode {
-        InstallMode::Normal
-    }
-}
 
 impl FromStr for InstallMode {
     type Err = Error;

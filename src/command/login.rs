@@ -16,9 +16,9 @@ pub fn login(
         &scope, &registry, &auth_type
     );
     info!("npm info located in the npm debug log");
-    npm::npm_login(&registry, &scope, &auth_type)?;
+    npm::npm_login(&registry, scope, auth_type)?;
     info!("Logged you in!");
 
-    PBAR.info(&"👋  logged you in!".to_string());
+    PBAR.info("👋  logged you in!");
     Ok(())
 }

@@ -47,9 +47,11 @@ pub struct Build {
 /// What sort of output we're going to be generating and flags we're invoking
 /// `wasm-bindgen` with.
 #[derive(Clone, Copy, Debug)]
+#[derive(Default)]
 pub enum Target {
     /// Default output mode or `--target bundler`, indicates output will be
     /// used with a bundle in a later step.
+    #[default]
     Bundler,
     /// Correspond to `--target web` where the output is natively usable as an
     /// ES module in a browser and the wasm is manually instantiated.
@@ -66,11 +68,6 @@ pub enum Target {
     Deno,
 }
 
-impl Default for Target {
-    fn default() -> Target {
-        Target::Bundler
-    }
-}
 
 impl fmt::Display for Target {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -116,6 +113,7 @@ pub enum BuildProfile {
 /// Everything required to configure and run the `wasm-pack build` command.
 #[derive(Debug, Args)]
 #[command(allow_hyphen_values = true, trailing_var_arg = true)]
+#[derive(Default)]
 pub struct BuildOptions {
     /// The path to the Rust crate. If not set, searches up the path from the current directory.
     #[clap()]
@@ -191,30 +189,6 @@ pub struct BuildOptions {
     pub extra_options: Vec<String>,
 }
 
-impl Default for BuildOptions {
-    fn default() -> Self {
-        Self {
-            path: None,
-            scope: None,
-            mode: InstallMode::default(),
-            disable_dts: false,
-            weak_refs: false,
-            reference_types: false,
-            target: Target::default(),
-            debug: false,
-            dev: false,
-            no_pack: false,
-            no_opt: false,
-            release: false,
-            profiling: false,
-            profile: None,
-            out_dir: String::new(),
-            out_name: None,
-            wbg_arg: Vec::new(),
-            extra_options: Vec::new(),
-        }
-    }
-}
 
 type BuildStep = fn(&mut Build) -> Result<()>;
 

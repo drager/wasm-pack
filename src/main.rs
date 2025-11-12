@@ -61,7 +61,7 @@ fn run() -> Result<()> {
     let wasm_pack_version = background_check_for_updates();
 
     // Deprecate `init`
-    if let Some("init") = env::args().nth(1).as_ref().map(|arg| arg.as_str()) {
+    if let Some("init") = env::args().nth(1).as_deref() {
         println!("wasm-pack init is deprecated, consider using wasm-pack build");
     }
 
