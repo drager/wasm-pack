@@ -138,6 +138,19 @@ example, to build the previous example using cargo's offline feature:
 wasm-pack build examples/js-hello-world --mode no-install -- --offline
 ```
 
+## Passing arguments to wasm-bindgen
+
+You can forward arbitrary flags to the underlying `wasm-bindgen` CLI by repeating `--wbg-arg` (alias: `--wbg`). For example:
+
+```
+wasm-pack build --wbg-arg --experimental-reset-state-function
+wasm-pack build --wbg-arg --weak-refs --wbg-arg --reference-types
+```
+
+Notes:
+- `--wbg-arg` may be specified multiple times; each value is appended to the `wasm-bindgen` invocation.
+- If a forwarded flag conflicts with a default flag that wasm-pack sets, the later one on the command line takes effect.
+
 <hr style="font-size: 1.5em; margin-top: 2.5em"/>
 
 <sup id="footnote-0">0</sup> If you need to include additional assets in the pkg

@@ -40,6 +40,7 @@ pub struct Build {
     pub out_name: Option<String>,
     pub bindgen: Option<install::Status>,
     pub cache: Cache,
+    pub bindgen_args: Vec<String>,
     pub extra_options: Vec<String>,
 }
 
@@ -182,6 +183,10 @@ pub struct BuildOptions {
     /// Option to skip optimization with wasm-opt
     pub no_opt: bool,
 
+    #[clap(long = "wbg-arg", visible_alias = "wbg", allow_hyphen_values = true)]
+    /// Pass an argument to wasm-bindgen. May be used multiple times.
+    pub wbg_arg: Vec<String>,
+
     /// List of extra options to pass to `cargo build`
     pub extra_options: Vec<String>,
 }
@@ -205,6 +210,7 @@ impl Default for BuildOptions {
             profile: None,
             out_dir: String::new(),
             out_name: None,
+            wbg_arg: Vec::new(),
             extra_options: Vec::new(),
         }
     }
@@ -259,6 +265,7 @@ impl Build {
             out_name: build_opts.out_name,
             bindgen: None,
             cache: cache::get_wasm_pack_cache()?,
+            bindgen_args: build_opts.wbg_arg,
             extra_options: build_opts.extra_options,
         })
     }
@@ -445,6 +452,7 @@ impl Build {
             self.target,
             self.profile.clone(),
             &self.extra_options,
+            &self.bindgen_args,
         )?;
         info!("wasm bindings were built at {:#?}.", &self.out_dir);
         Ok(())

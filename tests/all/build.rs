@@ -421,3 +421,26 @@ fn build_crates_with_same_names() {
         .assert()
         .success();
 }
+
+#[test]
+fn build_forwards_wbg_arg_to_wasm_bindgen() {
+    let fixture = utils::fixture::js_hello_world();
+    fixture.install_local_wasm_bindgen();
+
+    let cmd = fixture
+        .wasm_pack()
+        .arg("build")
+        .arg("--target")
+        .arg("web")
+        .arg("--wbg-arg")
+        .arg("--this-flag-should-be-forwarded")
+        .assert()
+        .failure();
+
+    let output = String::from_utf8(cmd.get_output().stderr.clone()).unwrap();
+    assert!(
+        output.contains("--this-flag-should-be-forwarded"),
+        "stderr did not contain forwarded flag, stderr was: {}",
+        output
+    );
+}
