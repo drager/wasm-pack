@@ -27,6 +27,7 @@ fn quiet() {
         .cargo_toml("js-hello-world")
         .hello_world_src_lib()
         .wasm_pack()
+        .env("RUSTFLAGS", "-Aunexpected_cfgs")
         .arg("--quiet")
         .arg("build")
         .assert()
