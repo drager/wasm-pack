@@ -109,9 +109,8 @@ pub enum BuildProfile {
 }
 
 /// Everything required to configure and run the `wasm-pack build` command.
-#[derive(Debug, Args)]
+#[derive(Debug, Args, Default)]
 #[command(allow_hyphen_values = true, trailing_var_arg = true)]
-#[derive(Default)]
 pub struct BuildOptions {
     /// The path to the Rust crate. If not set, searches up the path from the current directory.
     #[clap()]
