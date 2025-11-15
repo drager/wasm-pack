@@ -683,7 +683,7 @@ impl CrateData {
             None
         };
 
-        let keywords = if !pkg.keywords.is_empty() {
+        let keywords = if pkg.keywords.len() > 0 {
             Some(pkg.keywords.clone())
         } else {
             None
