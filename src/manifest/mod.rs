@@ -473,8 +473,8 @@ impl CrateData {
     }
 
     fn is_same_path(path1: &Path, path2: &Path) -> bool {
-        if let Ok(path1) = fs::canonicalize(path1) {
-            if let Ok(path2) = fs::canonicalize(path2) {
+        if let Ok(path1) = fs::canonicalize(&path1) {
+            if let Ok(path2) = fs::canonicalize(&path2) {
                 return path1 == path2;
             }
         }
