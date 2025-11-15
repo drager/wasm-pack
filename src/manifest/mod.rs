@@ -489,7 +489,7 @@ impl CrateData {
     /// Will return Err if the file (manifest_path) couldn't be read or
     /// if deserialize to `CargoManifest` fails.
     pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnsedKeys> {
-        let manifest = fs::read_to_string(manifest_path)
+        let manifest = fs::read_to_string(&manifest_path)
             .with_context(|| anyhow!("failed to read: {}", manifest_path.display()))?;
         let manifest = toml::Deserializer::new(&manifest);
 
