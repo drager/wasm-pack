@@ -67,7 +67,6 @@ pub enum Target {
     Deno,
 }
 
-
 impl fmt::Display for Target {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
