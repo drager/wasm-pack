@@ -46,8 +46,7 @@ pub struct Build {
 
 /// What sort of output we're going to be generating and flags we're invoking
 /// `wasm-bindgen` with.
-#[derive(Clone, Copy, Debug)]
-#[derive(Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub enum Target {
     /// Default output mode or `--target bundler`, indicates output will be
     /// used with a bundle in a later step.
