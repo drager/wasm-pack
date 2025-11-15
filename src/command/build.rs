@@ -186,7 +186,6 @@ pub struct BuildOptions {
     pub extra_options: Vec<String>,
 }
 
-
 type BuildStep = fn(&mut Build) -> Result<()>;
 
 impl Build {
