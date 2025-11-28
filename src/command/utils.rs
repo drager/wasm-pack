@@ -53,7 +53,7 @@ pub fn find_pkg_directory(path: &Path, pkg_directory: &Path) -> Option<PathBuf> 
     WalkDir::new(path)
         .into_iter()
         .filter_map(|x| x.ok().map(|e| e.into_path()))
-        .find(|x| is_pkg_directory(&x, pkg_directory))
+        .find(|x| is_pkg_directory(x, pkg_directory))
 }
 
 fn is_pkg_directory(path: &Path, pkg_directory: &Path) -> bool {

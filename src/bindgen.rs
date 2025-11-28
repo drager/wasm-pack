@@ -22,6 +22,7 @@ pub fn wasm_bindgen_build(
     target: Target,
     profile: BuildProfile,
     extra_options: &Vec<String>,
+    bindgen_args: &[String],
 ) -> Result<()> {
     let profile_name = match profile.clone() {
         BuildProfile::Release | BuildProfile::Profiling => "release",
@@ -94,6 +95,10 @@ pub fn wasm_bindgen_build(
     }
     if profile.wasm_bindgen_split_linked_modules() {
         cmd.arg("--split-linked-modules");
+    }
+
+    for a in bindgen_args {
+        cmd.arg(a);
     }
 
     child::run(cmd, "wasm-bindgen").context("Running the wasm-bindgen CLI")?;

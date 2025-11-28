@@ -120,8 +120,7 @@ impl Test {
             mut path_and_extra_options,
         } = test_opts;
 
-        let first_arg_is_path = path_and_extra_options
-            .get(0)
+        let first_arg_is_path = path_and_extra_options.first()
             .map(|first_arg| !first_arg.starts_with("-"))
             .unwrap_or(false);
 
@@ -295,7 +294,7 @@ impl Test {
         let status = install::download_prebuilt_or_cargo_install(
             Tool::WasmBindgen,
             &self.cache,
-            &bindgen_version,
+            bindgen_version,
             self.mode.install_permitted(),
         )?;
 

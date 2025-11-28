@@ -40,15 +40,17 @@ pub struct Build {
     pub out_name: Option<String>,
     pub bindgen: Option<install::Status>,
     pub cache: Cache,
+    pub bindgen_args: Vec<String>,
     pub extra_options: Vec<String>,
 }
 
 /// What sort of output we're going to be generating and flags we're invoking
 /// `wasm-bindgen` with.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub enum Target {
     /// Default output mode or `--target bundler`, indicates output will be
     /// used with a bundle in a later step.
+    #[default]
     Bundler,
     /// Correspond to `--target web` where the output is natively usable as an
     /// ES module in a browser and the wasm is manually instantiated.
@@ -63,12 +65,6 @@ pub enum Target {
     /// Correspond to `--target deno` where the output is natively usable as
     /// a Deno module loaded with `import`.
     Deno,
-}
-
-impl Default for Target {
-    fn default() -> Target {
-        Target::Bundler
-    }
 }
 
 impl fmt::Display for Target {
@@ -113,7 +109,7 @@ pub enum BuildProfile {
 }
 
 /// Everything required to configure and run the `wasm-pack build` command.
-#[derive(Debug, Args)]
+#[derive(Debug, Args, Default)]
 #[command(allow_hyphen_values = true, trailing_var_arg = true)]
 pub struct BuildOptions {
     /// The path to the Rust crate. If not set, searches up the path from the current directory.
@@ -182,32 +178,12 @@ pub struct BuildOptions {
     /// Option to skip optimization with wasm-opt
     pub no_opt: bool,
 
+    #[clap(long = "wbg-arg", visible_alias = "wbg", allow_hyphen_values = true)]
+    /// Pass an argument to wasm-bindgen. May be used multiple times.
+    pub wbg_arg: Vec<String>,
+
     /// List of extra options to pass to `cargo build`
     pub extra_options: Vec<String>,
-}
-
-impl Default for BuildOptions {
-    fn default() -> Self {
-        Self {
-            path: None,
-            scope: None,
-            mode: InstallMode::default(),
-            disable_dts: false,
-            weak_refs: false,
-            reference_types: false,
-            target: Target::default(),
-            debug: false,
-            dev: false,
-            no_pack: false,
-            no_opt: false,
-            release: false,
-            profiling: false,
-            profile: None,
-            out_dir: String::new(),
-            out_name: None,
-            extra_options: Vec::new(),
-        }
-    }
 }
 
 type BuildStep = fn(&mut Build) -> Result<()>;
@@ -259,6 +235,7 @@ impl Build {
             out_name: build_opts.out_name,
             bindgen: None,
             cache: cache::get_wasm_pack_cache()?,
+            bindgen_args: build_opts.wbg_arg,
             extra_options: build_opts.extra_options,
         })
     }
@@ -445,6 +422,7 @@ impl Build {
             self.target,
             self.profile.clone(),
             &self.extra_options,
+            &self.bindgen_args,
         )?;
         info!("wasm bindings were built at {:#?}.", &self.out_dir);
         Ok(())
