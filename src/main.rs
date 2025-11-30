@@ -61,7 +61,7 @@ fn run() -> Result<()> {
     let wasm_pack_version = background_check_for_updates();
 
     // Deprecate `init`
-    if let Some("init") = env::args().nth(1).as_ref().map(|arg| arg.as_str()) {
+    if let Some("init") = env::args().nth(1).as_deref() {
         println!("wasm-pack init is deprecated, consider using wasm-pack build");
     }
 
@@ -111,7 +111,7 @@ fn setup_panic_hooks() {
     let default_hook = panic::take_hook();
 
     if let Err(_) = env::var("RUST_BACKTRACE") {
-        panic::set_hook(Box::new(move |info: &panic::PanicInfo| {
+        panic::set_hook(Box::new(move |info: &panic::PanicHookInfo| {
             // First call the default hook that prints to standard error.
             default_hook(info);
 

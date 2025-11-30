@@ -77,7 +77,7 @@ pub fn install_geckodriver(cache: &Cache, installation_allowed: bool) -> Result<
 ///
 /// It returns the latest one without checking the installed `Firefox` version
 /// - it should be relatively safe because each `geckodriver` supports many `Firefox` versions:
-/// https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html#supported-platforms
+///   <https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html#supported-platforms>
 fn get_geckodriver_url(target: &str, ext: &str) -> String {
     let fetch_and_save_version =
         || fetch_latest_geckodriver_tag_json().and_then(save_geckodriver_version);

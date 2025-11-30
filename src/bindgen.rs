@@ -21,7 +21,7 @@ pub fn wasm_bindgen_build(
     reference_types: bool,
     target: Target,
     profile: BuildProfile,
-    extra_options: &Vec<String>,
+    extra_options: &[String],
 ) -> Result<()> {
     let profile_name = match profile.clone() {
         BuildProfile::Release | BuildProfile::Profiling => "release",

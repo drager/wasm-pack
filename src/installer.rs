@@ -24,7 +24,6 @@ use std::path::Path;
 use std::process;
 
 use anyhow::{anyhow, bail, Context, Result};
-use which;
 
 pub fn install() -> ! {
     if let Err(e) = do_install() {

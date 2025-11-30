@@ -68,7 +68,7 @@ pub fn check_for_wasm32_target() -> Result<()> {
 /// Get rustc's sysroot as a PathBuf
 fn get_rustc_sysroot() -> Result<PathBuf> {
     let command = Command::new("rustc")
-        .args(&["--print", "sysroot"])
+        .args(["--print", "sysroot"])
         .output()?;
 
     if command.status.success() {
@@ -84,7 +84,7 @@ fn get_rustc_sysroot() -> Result<PathBuf> {
 /// Get wasm32-unknown-unknown target libdir
 fn get_rustc_wasm32_unknown_unknown_target_libdir() -> Result<PathBuf> {
     let command = Command::new("rustc")
-        .args(&[
+        .args([
             "--target",
             "wasm32-unknown-unknown",
             "--print",

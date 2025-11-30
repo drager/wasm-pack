@@ -152,7 +152,7 @@ impl Crate {
 
         match old_metadata_file {
             Some(ref file_contents) => {
-                let last_updated = Self::return_stamp_file_value(&file_contents, "created")
+                let last_updated = Self::return_stamp_file_value(file_contents, "created")
                     .and_then(|t| DateTime::parse_from_str(t.as_str(), "%+").ok());
 
                 last_updated
@@ -160,7 +160,7 @@ impl Crate {
                         if current_time.signed_duration_since(last_updated).num_hours() > 24 {
                             Self::return_api_call_result(current_time).map(Some)
                         } else {
-                            Ok(Self::return_stamp_file_value(&file_contents, "version"))
+                            Ok(Self::return_stamp_file_value(file_contents, "version"))
                         }
                     })
                     .unwrap_or_else(|| Ok(None))
@@ -177,7 +177,7 @@ impl Crate {
         // "policy" as the success. This means that the 24 hours rate limiting
         // will be active regardless if the check succeeded or failed.
         match version {
-            Ok(ref version) => Self::override_stamp_file(current_time, Some(&version)).ok(),
+            Ok(ref version) => Self::override_stamp_file(current_time, Some(version)).ok(),
             Err(_) => Self::override_stamp_file(current_time, None).ok(),
         };
 
@@ -192,7 +192,6 @@ impl Crate {
 
         let mut file = fs::OpenOptions::new()
             .read(true)
-            .write(true)
             .append(true)
             .create(true)
             .open(path.with_extension("stamp"))?;
@@ -240,7 +239,7 @@ impl Crate {
             .try_proxy_from_env(true)
             .user_agent(&format!(
                 "wasm-pack/{} ({})",
-                WASM_PACK_VERSION.unwrap_or_else(|| "unknown"),
+                WASM_PACK_VERSION.unwrap_or("unknown"),
                 WASM_PACK_REPO_URL
             ))
             .build();
@@ -251,7 +250,7 @@ impl Crate {
 
         let status_code = resp.status();
 
-        if 200 <= status_code && status_code < 300 {
+        if (200..300).contains(&status_code) {
             let json = resp.into_json()?;
 
             Ok(json)
@@ -473,8 +472,8 @@ impl CrateData {
     }
 
     fn is_same_path(path1: &Path, path2: &Path) -> bool {
-        if let Ok(path1) = fs::canonicalize(&path1) {
-            if let Ok(path2) = fs::canonicalize(&path2) {
+        if let Ok(path1) = fs::canonicalize(path1) {
+            if let Ok(path2) = fs::canonicalize(path2) {
                 return path1 == path2;
             }
         }
@@ -489,7 +488,7 @@ impl CrateData {
     /// Will return Err if the file (manifest_path) couldn't be read or
     /// if deserialize to `CargoManifest` fails.
     pub fn parse_crate_data(manifest_path: &Path) -> Result<ManifestAndUnsedKeys> {
-        let manifest = fs::read_to_string(&manifest_path)
+        let manifest = fs::read_to_string(manifest_path)
             .with_context(|| anyhow!("failed to read: {}", manifest_path.display()))?;
         let manifest = toml::Deserializer::new(&manifest);
 
@@ -683,7 +682,7 @@ impl CrateData {
             None
         };
 
-        let keywords = if pkg.keywords.len() > 0 {
+        let keywords = if !pkg.keywords.is_empty() {
             Some(pkg.keywords.clone())
         } else {
             None

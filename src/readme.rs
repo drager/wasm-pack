@@ -10,11 +10,11 @@ use crate::PBAR;
 /// Copy the crate's README into the `pkg` directory.
 pub fn copy_from_crate(crate_data: &CrateData, path: &Path, out_dir: &Path) -> Result<()> {
     assert!(
-        fs::metadata(path).ok().map_or(false, |m| m.is_dir()),
+        fs::metadata(path).ok().is_some_and(|m| m.is_dir()),
         "crate directory should exist"
     );
     assert!(
-        fs::metadata(&out_dir).ok().map_or(false, |m| m.is_dir()),
+        fs::metadata(out_dir).ok().is_some_and(|m| m.is_dir()),
         "crate's pkg directory should exist"
     );
 
