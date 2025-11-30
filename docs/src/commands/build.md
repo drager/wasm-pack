@@ -115,6 +115,20 @@ the npm documentation [here][npm-scope-documentation].
 
 [npm-scope-documentation]: https://docs.npmjs.com/misc/scope
 
+## Name
+
+The `build` command also accepts an optional `--package-name` argument. This will override package name, which defaults to crate name. For example:
+
+```
+wasm-pack build examples/js-hello-world --package-name hello-world
+```
+
+This command would create a `package.json` file for a package called
+`hello-world`. For more information about scoping, you can refer to
+the npm documentation [here][npm-name-documentation].
+
+[npm-name-documentation]: https://docs.npmjs.com/cli/v11/configuring-npm/package-json#name
+
 ## Mode
 
 The `build` command accepts an optional `--mode` argument.
