@@ -7,6 +7,7 @@ const windows = "x86_64-pc-windows-msvc";
 const getPlatform = () => {
   const type = os.type();
   const arch = os.arch();
+  const release = os.release();
 
   // https://github.com/nodejs/node/blob/c3664227a83cf009e9a2e1ddeadbd09c14ae466f/deps/uv/src/win/util.c#L1566-L1573
   if ((type === "Windows_NT" || type.startsWith("MINGW32_NT-")) && arch === "x64") {
@@ -21,8 +22,11 @@ const getPlatform = () => {
   if (type === "Darwin" && (arch === "x64" || arch === "arm64")) {
     return "x86_64-apple-darwin";
   }
+  if (type === "OpenBSD" && arch === "x64") {
+    return `x86_64-unknown-openbsd${release}`;
+  }
 
-  throw new Error(`Unsupported platform: ${type} ${arch}`);
+  throw new Error(`Unsupported platform: ${type} ${release} ${arch}`);
 };
 
 const getBinary = () => {
