@@ -16,6 +16,7 @@ env:
   MACOS_ARM64_TARGET: aarch64-apple-darwin
   LINUX_AMD64_TARGET: x86_64-unknown-linux-musl
   LINUX_ARM64_TARGET: aarch64-unknown-linux-musl
+  OPENBSD_AMD64_TARGET: x86_64-unknown-openbsd
 
   # Space separated paths to include in the archive.
   RELEASE_ADDS: README.md LICENSE-APACHE LICENSE-MIT
@@ -111,9 +112,65 @@ jobs:
           name: ${{ matrix.target }}
           path: ./${{ env.RELEASE_DIR }}
 
+  build-openbsd:
+    name: Build artifacts (OpenBSD)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - name: openbsd
+            architecture: x86-64
+            version: '7.7'
+
+          - name: openbsd
+            architecture: x86-64
+            version: '7.8'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Query version number
+        id: get_version
+        shell: bash
+        run: |
+          echo "using version tag ${GITHUB_REF:10}"
+          echo ::set-output name=version::"${GITHUB_REF:10}"
+
+      - name: Build
+        uses: cross-platform-actions/action@v0.32.0
+        with:
+          operating_system: ${{ matrix.os.name }}
+          architecture: ${{ matrix.os.architecture }}
+          version: ${{ matrix.os.version }}
+          run: |
+            sudo pkg_add rust
+            cargo build --release
+
+      - name: Create artifact directory
+        run: |
+          mkdir ${{ env.RELEASE_DIR }}
+          mkdir -p ${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }}
+
+      - name: Move binaries
+        run: |
+          mv ./target/release/${{ env.RELEASE_BIN }} ${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }}/${{ env.RELEASE_BIN }}
+          mv ${{ env.RELEASE_ADDS }} ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }}
+
+      - name: Create tarball
+        shell: bash
+        run: 7z a -ttar -so -an ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }} | 7z a -si ./${{ env.RELEASE_DIR }}/${{ env.RELEASE_BIN }}-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }}.tar.gz
+
+      - name: Upload Zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.OPENBSD_AMD64_TARGET }}${{ matrix.os.version }}
+          path: ./${{ env.RELEASE_DIR }}
+
   release:
     name: GitHub Release
-    needs: build
+    needs:
+      - build
+      - build-openbsd
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -157,6 +214,16 @@ jobs:
         uses: actions/download-artifact@v4.1.7
         with:
           name: ${{ env.MACOS_AMD64_TARGET }}
+
+      - name: Download OpenBSD 7.7 amd64 tarball
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ env.OPENBSD_AMD64_TARGET }}7.7
+
+      - name: Download OpenBSD 7.8 amd64 tarball
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ env.OPENBSD_AMD64_TARGET }}7.8
 
       - name: Release Linux amd64 tarball
         uses: actions/upload-release-asset@v1
@@ -216,3 +283,23 @@ jobs:
           asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM64_TARGET }}.tar.gz
           asset_content_type: application/gzip
           asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.MACOS_ARM64_TARGET }}.tar.gz
+
+      - name: Release OpenBSD 7.7 amd64 tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}7.7.tar.gz
+          asset_content_type: application/gzip
+          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}7.7.tar.gz
+
+      - name: Release OpenBSD 7.8 amd64 tarball
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}7.8.tar.gz
+          asset_content_type: application/gzip
+          asset_name: wasm-pack-${{ steps.get_version.outputs.VERSION }}-${{ env.OPENBSD_AMD64_TARGET }}7.8.tar.gz
