@@ -1,4 +1,4 @@
-const { Binary } = require("binary-install");
+const { Binary } = require("simple-binary-install");
 const { join } = require("path");
 const os = require("os");
 
