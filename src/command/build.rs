@@ -387,8 +387,12 @@ impl Build {
 
     fn step_build_wasm(&mut self) -> Result<()> {
         info!("Building wasm...");
-        let wasm_path =
-            build::cargo_build_wasm(&self.crate_path, self.profile.clone(), &self.extra_options)?;
+        let wasm_path = build::cargo_build_wasm(
+            &self.crate_path,
+            self.profile.clone(),
+            &self.extra_options,
+            &self.target_triple,
+        )?;
         info!("wasm built at {wasm_path:#?}.");
         self.wasm_path = Some(wasm_path);
         Ok(())
@@ -474,6 +478,9 @@ impl Build {
         };
         if self.reference_types {
             args.push("--enable-reference-types".into());
+        }
+        if self.target_triple.starts_with("wasm64") {
+            args.push("--enable-memory64".into());
         }
         info!("executing wasm-opt with {:?}", args);
         wasm_opt::run(
