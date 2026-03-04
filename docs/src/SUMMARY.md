@@ -4,7 +4,7 @@
 - [Quickstart](./quickstart.md)
 - [Prerequisites](./prerequisites/index.md)
   - [npm (optional)](./prerequisites/npm.md)
-  - [considerations](./prerequisites/considerations.md)
+  - [Considerations](./prerequisites/considerations.md)
   - [Non-`rustup` setups](./prerequisites/non-rustup-setups.md)
 - [Commands](./commands/index.md)
   - [`new`](./commands/new.md)
