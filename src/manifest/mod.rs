@@ -557,7 +557,7 @@ impl CrateData {
             return Ok(());
         }
         bail!(
-            "crate-type must be cdylib to compile to wasm32-unknown-unknown. Add the following to your \
+            "crate-type must be cdylib to compile to WebAssembly. Add the following to your \
              Cargo.toml file:\n\n\
              [lib]\n\
              crate-type = [\"cdylib\", \"rlib\"]"
