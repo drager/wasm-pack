@@ -1,6 +1,6 @@
 # nodejs
 
-Currently, `wasm-pack` generated npm modules require us to you have [fetch] polyfill in your node project.
+Currently, `wasm-pack` generated npm modules require you to have the [fetch] polyfill in your node project.
 
 If there is a module from `wasm-pack build --target nodejs` you may encounter some errors regarding global `Headers`, `Request`, `Response` and `fetch` Web APIs.
 
