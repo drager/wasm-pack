@@ -79,6 +79,7 @@ pub fn cargo_build_wasm(
     path: &Path,
     profile: BuildProfile,
     extra_options: &[String],
+    target_triple: &str,
 ) -> Result<String> {
     let msg = format!("{}Compiling to Wasm...", emoji::CYCLONE);
     PBAR.info(&msg);
@@ -111,9 +112,7 @@ pub fn cargo_build_wasm(
         }
     }
 
-    // If user has specified a custom --target in Cargo options, we shouldn't override it.
-    // Otherwise, default to wasm32-unknown-unknown.
-    cmd.env("CARGO_BUILD_TARGET", "wasm32-unknown-unknown");
+    cmd.env("CARGO_BUILD_TARGET", target_triple);
 
     // The `cargo` command is executed inside the directory at `path`, so relative paths set via extra options won't work.
     // To remedy the situation, all detected paths are converted to absolute paths.
@@ -192,7 +191,12 @@ pub fn cargo_build_wasm(
 /// * `path`: Path to the crate directory to build tests.
 /// * `debug`: Whether to build tests in `debug` mode.
 /// * `extra_options`: Additional parameters to pass to `cargo` when building tests.
-pub fn cargo_build_wasm_tests(path: &Path, debug: bool, extra_options: &[String]) -> Result<()> {
+pub fn cargo_build_wasm_tests(
+    path: &Path,
+    debug: bool,
+    extra_options: &[String],
+    target_triple: &str,
+) -> Result<()> {
     let mut cmd = Command::new("cargo");
 
     cmd.current_dir(path).arg("build").arg("--tests");
@@ -205,7 +209,7 @@ pub fn cargo_build_wasm_tests(path: &Path, debug: bool, extra_options: &[String]
         cmd.arg("--release");
     }
 
-    cmd.env("CARGO_BUILD_TARGET", "wasm32-unknown-unknown");
+    cmd.env("CARGO_BUILD_TARGET", target_triple);
 
     cmd.args(extra_options);
 

@@ -16,6 +16,7 @@ pub fn cargo_test_wasm<I, K, V>(
     release: bool,
     envs: I,
     extra_options: &[String],
+    target_triple: &str,
 ) -> Result<()>
 where
     I: IntoIterator<Item = (K, V)>,
@@ -35,7 +36,7 @@ where
         cmd.arg("--release");
     }
 
-    cmd.arg("--target").arg("wasm32-unknown-unknown");
+    cmd.arg("--target").arg(target_triple);
 
     cmd.args(extra_options);
 
