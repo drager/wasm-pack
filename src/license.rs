@@ -58,8 +58,13 @@ pub fn copy_from_crate(crate_data: &CrateData, path: &Path, out_dir: &Path) -> R
                         PBAR.info("License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory");
                         return Ok(());
                     }
+
                     for license_file in files {
                         let crate_license_path = path.join(&license_file);
+                        if crate_license_path.is_dir() {
+                            continue;
+                        }
+
                         let new_license_path = out_dir.join(&license_file);
                         if fs::copy(&crate_license_path, &new_license_path).is_err() {
                             PBAR.info("origin crate has no LICENSE");
