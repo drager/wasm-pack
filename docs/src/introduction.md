@@ -1,4 +1,4 @@
-![wasm ferris](https://drager.github.io/wasm-pack/public/img/wasm-ferris.png)
+![wasm ferris](https://wasm-bindgen.github.io/wasm-pack/public/img/wasm-ferris.png)
 
 <h1 style="text-align: center;">Welcome to the <code>wasm-pack</code> docs!</h1>
 
@@ -11,4 +11,4 @@ alongside any javascript packages in workflows that you already use, such as [we
 [webpack]: https://webpack.js.org/
 
 
-![demo](https://github.com/drager/wasm-pack/raw/master/demo.gif)
+![demo](https://github.com/wasm-bindgen/wasm-pack/raw/master/demo.gif)

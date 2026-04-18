@@ -41,7 +41,7 @@ fi
 
 # Resolve "latest" to actual version number
 if [ "$VERSION" = "latest" ]; then
-    VERSION=$(curl -s https://api.github.com/repos/drager/wasm-pack/releases/latest | grep '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')
+    VERSION=$(curl -s https://api.github.com/repos/wasm-bindgen/wasm-pack/releases/latest | grep '"tag_name"' | sed -E 's/.*"v?([^"]+)".*/\1/')
     if [ -z "$VERSION" ]; then
         err "failed to fetch latest version from GitHub API"
     fi
@@ -53,7 +53,7 @@ case "$VERSION" in
     *) VERSION="v$VERSION" ;;
 esac
 
-UPDATE_ROOT="https://github.com/drager/wasm-pack/releases/download/$VERSION"
+UPDATE_ROOT="https://github.com/wasm-bindgen/wasm-pack/releases/download/$VERSION"
 
 main() {
     downloader --check
@@ -173,7 +173,7 @@ get_architecture() {
 
     esac
 
-    # See https://github.com/drager/wasm-pack/pull/1088
+    # See https://github.com/wasm-bindgen/wasm-pack/pull/1088
     if [ "$_cputype" = "aarch64" ] && [ "$_ostype" = "apple-darwin" ]; then
         _cputype="x86_64"
     fi

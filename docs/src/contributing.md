@@ -8,11 +8,11 @@ using it. You can find them documented [here][1].
 You'll also want to check out the contributing [guidelines].
 
 [1]: ./prerequisites/index.html
-[guidelines]: https://github.com/drager/wasm-pack/blob/master/CONTRIBUTING.md
+[guidelines]: https://github.com/wasm-bindgen/wasm-pack/blob/master/CONTRIBUTING.md
 
 ## 🏃‍♀️ Up and Running
 
-1. fork and clone the `drager/wasm-pack` repository
+1. fork and clone the `wasm-bindgen/wasm-pack` repository
 2. install [node/npm]
 3. `cd wasm-pack`
 4. `cargo run`. To test command line arguments you can run `cargo run -- <args>`.

@@ -3,12 +3,12 @@ name = "wasm-pack"
 description = "📦✨ your favorite rust -> wasm workflow tool!"
 version = "0.14.0"
 authors = ["Ashley Williams <ashley666ashley@gmail.com>", "Jesper Håkansson <jesper@jesperh.se>"]
-repository = "https://github.com/drager/wasm-pack.git"
+repository = "https://github.com/wasm-bindgen/wasm-pack.git"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 readme = "README.md"
 categories = ["wasm"]
-documentation = "https://drager.github.io/wasm-pack/"
+documentation = "https://wasm-bindgen.github.io/wasm-pack/"
 
 [dependencies]
 anyhow = "1.0.100"

@@ -1102,7 +1102,7 @@
     installing the target on your specific rust setup- including the fact that
     it may _not_ be possible to add the target to some setups.
 
-    Check out the docs [here](https://drager.github.io/wasm-pack/book/prerequisites/non-rustup-setups.html).
+    Check out the docs [here](https://wasm-bindgen.github.io/wasm-pack/book/prerequisites/non-rustup-setups.html).
 
     [issue/579]: https://github.com/rustwasm/wasm-pack/issues/579
     [pull/602]: https://github.com/rustwasm/wasm-pack/pull/602
@@ -1183,7 +1183,7 @@
     wasm-pack build --target web
     ```
 
-    Learn more about how to use this target by [checking out the docs!](https://drager.github.io/wasm-pack/book/commands/build.html#target)
+    Learn more about how to use this target by [checking out the docs!](https://wasm-bindgen.github.io/wasm-pack/book/commands/build.html#target)
 
     [pull/567]: https://github.com/rustwasm/wasm-pack/pull/567
 
@@ -1363,7 +1363,7 @@
 
     [DebugSteve]: https://github.com/DebugSteven
     [single location]: https://rustwasm.github.io/docs.html
-    [See `wasm-pack's` master docs here]: https://drager.github.io/wasm-pack/book/
+    [See `wasm-pack's` master docs here]: https://wasm-bindgen.github.io/wasm-pack/book/
     [pull/565]: https://github.com/rustwasm/wasm-pack/pull/565
 
   - **Add new QuickStart guide for "Hybrid Applications with Webpack" - [DebugSteven] [pull/536]**
@@ -1378,7 +1378,7 @@
     [This template] hasn't gotten as much attention because we've lacked a quickstart guide for folks to discover
     and follow- now we've got one!
 
-    Check out the guide [here](https://drager.github.io/wasm-pack/book/tutorials/hybrid-applications-with-webpack/index.html)!
+    Check out the guide [here](https://wasm-bindgen.github.io/wasm-pack/book/tutorials/hybrid-applications-with-webpack/index.html)!
 
     [This temaplte]: https://github.com/rustwasm/rust-webpack-template
     [DebugSteven]: https://github.com/DebugSteven
@@ -1391,7 +1391,7 @@
     However, for folks who don't use the template, `wee_alloc` is something important to know about- so now we have
     given it its own section!
 
-    Check out the deepdive [here](https://drager.github.io/wasm-pack/book/tutorials/npm-browser-packages/template-deep-dive/wee_alloc.html)!
+    Check out the deepdive [here](https://wasm-bindgen.github.io/wasm-pack/book/tutorials/npm-browser-packages/template-deep-dive/wee_alloc.html)!
 
     [surma]: https://github.com/surma
     [pull/542]: https://github.com/rustwasm/wasm-pack/pull/542
@@ -1482,7 +1482,7 @@
     As always- there are defaults for you to use, but if you love to configure (or have a project that requires it),
     get excited, as your options have grown now and will continue to!
 
-    [profile-config-docs]: https://drager.github.io/wasm-pack/book/cargo-toml-configuration.html
+    [profile-config-docs]: https://wasm-bindgen.github.io/wasm-pack/book/cargo-toml-configuration.html
     [`cargo profile` documentation]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-profile-sections
     [issue/153]: https://github.com/rustwasm/wasm-pack/issues/153
     [issue/160]: https://github.com/rustwasm/wasm-pack/issues/160
@@ -1510,7 +1510,7 @@
     In the above example, the flag `-Z offline` will be passed to `cargo build`. This feature is documented
     [here][cargo opts docs].
 
-    [cargo opts docs]: https://drager.github.io/wasm-pack/book/commands/build.html#extra-options
+    [cargo opts docs]: https://wasm-bindgen.github.io/wasm-pack/book/commands/build.html#extra-options
     [torkve]: https://github.com/torkve
     [issue/455]: https://github.com/rustwasm/wasm-pack/issues/455
     [pull/461]: https://github.com/rustwasm/wasm-pack/pull/461
@@ -1849,7 +1849,7 @@
 
     This PR also has a complete rework of our documentation.
 
-    Check it out [here](https://drager.github.io/wasm-pack/)!
+    Check it out [here](https://wasm-bindgen.github.io/wasm-pack/)!
 
   - #### 🍱 Module Support
 
@@ -2062,7 +2062,7 @@
       This is experimental- so please try it out and file issues as you run into things!
       You'll always be able to use `cargo install` as a backup.
 
-      Checkout the new installer [here](https://drager.github.io/wasm-pack/installer/)!
+      Checkout the new installer [here](https://wasm-bindgen.github.io/wasm-pack/installer/)!
 
       [pull/307]: https://github.com/rustwasm/wasm-pack/pull/307
 

@@ -90,7 +90,7 @@ fn it_creates_a_package_json_default_path() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.main, "js_hello_world.js");
     assert_eq!(pkg.types, "js_hello_world.d.ts");
@@ -189,7 +189,7 @@ fn it_creates_a_pkg_json_with_correct_files_on_node() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.main, "js_hello_world.js");
     assert_eq!(pkg.types, "js_hello_world.d.ts");
@@ -223,7 +223,7 @@ fn it_creates_a_pkg_json_with_correct_files_on_nomodules() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.browser, "js_hello_world.js");
     assert_eq!(pkg.types, "js_hello_world.d.ts");
@@ -258,7 +258,7 @@ fn it_creates_a_package_json_with_correct_files_when_out_name_is_provided() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.main, "index.js");
     assert_eq!(pkg.types, "index.d.ts");
@@ -306,7 +306,7 @@ fn it_creates_a_package_json_with_correct_keys_when_types_are_skipped() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.main, "js_hello_world.js");
     assert_eq!(pkg.description, "so awesome rust+wasm package");
@@ -361,7 +361,7 @@ fn it_creates_a_package_json_with_npm_dependencies_provided_by_wasm_bindgen() {
     assert_eq!(pkg.repository.ty, "git");
     assert_eq!(
         pkg.repository.url,
-        "https://github.com/drager/wasm-pack.git"
+        "https://github.com/wasm-bindgen/wasm-pack.git"
     );
     assert_eq!(pkg.main, "js_hello_world.js");
 
@@ -403,9 +403,9 @@ fn it_sets_homepage_field_if_available_in_cargo_toml() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "homepage-field-test"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
-            homepage = "https://drager.github.io/wasm-pack/"
+            homepage = "https://wasm-bindgen.github.io/wasm-pack/"
 
             [lib]
             crate-type = ["cdylib"]
@@ -429,7 +429,7 @@ fn it_sets_homepage_field_if_available_in_cargo_toml() {
     let pkg = utils::manifest::read_package_json(&fixture.path, &out_dir).unwrap();
     assert_eq!(
         pkg.homepage,
-        Some("https://drager.github.io/wasm-pack/".to_string()),
+        Some("https://wasm-bindgen.github.io/wasm-pack/".to_string()),
     );
 
     // When 'homepage' is unavailable
@@ -458,7 +458,7 @@ fn it_sets_keywords_field_if_available_in_cargo_toml() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "homepage-field-test"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
             keywords = ["wasm"]
 
@@ -523,7 +523,7 @@ fn configure_wasm_bindgen_debug_incorrectly_is_error() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "whatever"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -557,7 +557,7 @@ fn parse_crate_data_returns_unused_keys_in_cargo_toml() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "whatever"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -626,9 +626,9 @@ fn it_recurses_up_the_path_to_find_cargo_toml() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "recurse-for-manifest-test"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
-            homepage = "https://drager.github.io/wasm-pack/"
+            homepage = "https://wasm-bindgen.github.io/wasm-pack/"
         "#,
     );
     let path = get_crate_path(None).unwrap();
@@ -648,9 +648,9 @@ fn it_doesnt_recurse_up_the_path_to_find_cargo_toml_when_default() {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "recurse-for-manifest-test"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
-            homepage = "https://drager.github.io/wasm-pack/"
+            homepage = "https://wasm-bindgen.github.io/wasm-pack/"
         "#,
     );
     let path = get_crate_path(Some(PathBuf::from("src"))).unwrap();
