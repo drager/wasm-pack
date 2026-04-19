@@ -2,7 +2,7 @@
 
 use crate::child;
 use crate::command::publish::access::Access;
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context, Result};
 use log::info;
 
 /// The default npm registry used when we aren't working with a custom registry.
@@ -49,7 +49,16 @@ pub fn npm_login(registry: &str, scope: &Option<String>, auth_type: &Option<Stri
     cmd.args(args);
 
     info!("Running {:?}", cmd);
-    if cmd.status()?.success() {
+    let status = cmd.status().map_err(|err| {
+        if err.kind() == std::io::ErrorKind::NotFound {
+            anyhow!(
+                "failed to execute `npm login`; make sure the `npm` executable is installed and available on your PATH"
+            )
+        } else {
+            anyhow!("failed to execute `npm login`: {err}")
+        }
+    })?;
+    if status.success() {
         Ok(())
     } else {
         bail!("Login to registry {} failed", registry)

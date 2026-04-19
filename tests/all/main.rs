@@ -18,6 +18,7 @@ mod generate;
 mod license;
 mod lockfile;
 mod log_level;
+mod login;
 mod manifest;
 mod readme;
 mod stamps;
