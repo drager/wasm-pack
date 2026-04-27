@@ -73,6 +73,13 @@ pub struct TestOptions {
     /// Build with the release profile.
     pub release: bool,
 
+    #[clap(long = "panic-unwind")]
+    /// Build tests with panic=unwind. Requires the nightly Rust toolchain;
+    /// uses `-Z build-std` to rebuild `std` with `-Cpanic=unwind`. The nightly
+    /// toolchain, `rust-src` component, and nightly `wasm32-unknown-unknown`
+    /// target will be installed via `rustup` if not already present.
+    pub panic_unwind: bool,
+
     /// Path to the Rust crate, and extra options to pass to `cargo test`.
     ///
     /// If the path is not provided, this command searches up the path from the current directory.
@@ -97,6 +104,7 @@ pub struct Test {
     safaridriver: Option<PathBuf>,
     headless: bool,
     release: bool,
+    panic_unwind: bool,
     test_runner_path: Option<PathBuf>,
     extra_options: Vec<String>,
     target_triple: String,
@@ -112,6 +120,7 @@ impl Test {
             mode,
             headless,
             release,
+            panic_unwind,
             chrome,
             chromedriver,
             firefox,
@@ -175,6 +184,7 @@ impl Test {
             safaridriver,
             headless,
             release,
+            panic_unwind,
             test_runner_path: None,
             target_triple,
             extra_options,
@@ -256,6 +266,11 @@ impl Test {
     }
 
     fn step_check_rustc_version(&mut self) -> Result<()> {
+        // Stable rustc version is irrelevant when --panic-unwind is set.
+        if self.panic_unwind {
+            info!("Skipping rustc version check (using nightly via --panic-unwind).");
+            return Ok(());
+        }
         info!("Checking rustc version...");
         let _ = build::check_rustc_version()?;
         info!("Rustc version is correct.");
@@ -263,6 +278,12 @@ impl Test {
     }
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
+        if self.panic_unwind {
+            info!("Checking nightly toolchain prerequisites for panic=unwind...");
+            build::wasm_target::check_nightly_prerequisites()?;
+            info!("Nightly prerequisites check was successful.");
+            return Ok(());
+        }
         info!("Adding wasm-target...");
         build::wasm_target::check_for_wasm_target(&self.target_triple)?;
         info!("Adding wasm-target was successful.");
@@ -285,6 +306,7 @@ impl Test {
             !self.release,
             extra_options,
             &self.target_triple,
+            self.panic_unwind,
         )?;
 
         info!("Finished compiling tests to wasm.");

@@ -80,12 +80,22 @@ pub fn cargo_build_wasm(
     profile: BuildProfile,
     extra_options: &[String],
     target_triple: &str,
+    panic_unwind: bool,
 ) -> Result<String> {
-    let msg = format!("{}Compiling to Wasm...", emoji::CYCLONE);
+    let msg = if panic_unwind {
+        format!("{}Compiling to Wasm (with panic=unwind)...", emoji::CYCLONE)
+    } else {
+        format!("{}Compiling to Wasm...", emoji::CYCLONE)
+    };
     PBAR.info(&msg);
 
     let mut cmd = Command::new("cargo");
-    cmd.current_dir(path).arg("build").arg("--lib");
+    cmd.current_dir(path);
+    // `+nightly` must be the first argument to cargo.
+    if panic_unwind {
+        cmd.arg("+nightly");
+    }
+    cmd.arg("build").arg("--lib");
 
     if PBAR.quiet() {
         cmd.arg("--quiet");
@@ -113,6 +123,19 @@ pub fn cargo_build_wasm(
     }
 
     cmd.env("CARGO_BUILD_TARGET", target_triple);
+
+    if panic_unwind {
+        cmd.arg("-Z").arg("build-std=std,panic_unwind");
+
+        // Append `-Cpanic=unwind` to any user-provided RUSTFLAGS.
+        let existing = std::env::var("RUSTFLAGS").unwrap_or_default();
+        let combined = if existing.is_empty() {
+            "-Cpanic=unwind".to_string()
+        } else {
+            format!("{existing} -Cpanic=unwind")
+        };
+        cmd.env("RUSTFLAGS", combined);
+    }
 
     // The `cargo` command is executed inside the directory at `path`, so relative paths set via extra options won't work.
     // To remedy the situation, all detected paths are converted to absolute paths.
@@ -191,15 +214,24 @@ pub fn cargo_build_wasm(
 /// * `path`: Path to the crate directory to build tests.
 /// * `debug`: Whether to build tests in `debug` mode.
 /// * `extra_options`: Additional parameters to pass to `cargo` when building tests.
+/// * `target_triple`: The wasm target triple to build for (e.g.
+///   `wasm32-unknown-unknown` or `wasm64-unknown-unknown`).
+/// * `panic_unwind`: Whether to build tests with `panic=unwind` via the nightly
+///   toolchain and `-Z build-std`.
 pub fn cargo_build_wasm_tests(
     path: &Path,
     debug: bool,
     extra_options: &[String],
     target_triple: &str,
+    panic_unwind: bool,
 ) -> Result<()> {
     let mut cmd = Command::new("cargo");
-
-    cmd.current_dir(path).arg("build").arg("--tests");
+    cmd.current_dir(path);
+    // `+nightly` must be the first argument to cargo.
+    if panic_unwind {
+        cmd.arg("+nightly");
+    }
+    cmd.arg("build").arg("--tests");
 
     if PBAR.quiet() {
         cmd.arg("--quiet");
@@ -210,6 +242,18 @@ pub fn cargo_build_wasm_tests(
     }
 
     cmd.env("CARGO_BUILD_TARGET", target_triple);
+
+    if panic_unwind {
+        cmd.arg("-Z").arg("build-std=std,panic_unwind");
+
+        let existing = std::env::var("RUSTFLAGS").unwrap_or_default();
+        let combined = if existing.is_empty() {
+            "-Cpanic=unwind".to_string()
+        } else {
+            format!("{existing} -Cpanic=unwind")
+        };
+        cmd.env("RUSTFLAGS", combined);
+    }
 
     cmd.args(extra_options);
 

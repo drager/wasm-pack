@@ -39,6 +39,16 @@ Choose where to run your tests by passing in any combination of testing environm
 wasm-pack test --node --firefox --chrome --safari --headless
 ```
 
+## Panic strategy
+
+The `test` command accepts the `--panic-unwind` flag, which builds the test
+binary with `panic=unwind` via the nightly toolchain and `-Z build-std`. See
+the [`build` command's documentation](./build.md#panic-strategy) for details.
+
+```
+wasm-pack test --node --panic-unwind
+```
+
 ## Extra options
 
 The `test` command can pass extra options straight to `cargo test` even if they are not

@@ -138,6 +138,45 @@ example, to build the previous example using cargo's offline feature:
 wasm-pack build examples/js-hello-world --mode no-install -- --offline
 ```
 
+## Panic strategy
+
+By default, Rust panics in WebAssembly compile with `panic=abort`, which aborts
+the WebAssembly instance on panic. The `--panic-unwind` flag changes this so
+panics can be caught at FFI boundaries and converted to JavaScript exceptions
+by tools like [`wasm-bindgen`'s catch-unwind support][wbg-catch-unwind].
+
+```
+wasm-pack build --panic-unwind
+```
+
+This flag:
+
+- Invokes `cargo` with the **nightly** toolchain (`cargo +nightly build`).
+- Adds `-Z build-std=std,panic_unwind` to rebuild `std` with unwinding
+  support.
+- Sets `RUSTFLAGS=-Cpanic=unwind` (preserving any user-provided `RUSTFLAGS`).
+
+The first time you use `--panic-unwind`, `wasm-pack` will install any missing
+prerequisites via `rustup`:
+
+- The nightly toolchain
+- The `rust-src` component for nightly
+- The `wasm32-unknown-unknown` target for nightly
+
+If you are not using `rustup` you must install these prerequisites manually.
+See [Non-`rustup` setups][non-rustup].
+
+> **Note:** `wasm-pack` only handles producing the `.wasm`. The actual
+> "panic = recoverable JavaScript exception" behaviour requires runtime glue
+> from your bindings layer (e.g. `wasm-bindgen`'s catch-unwind feature). With
+> just `--panic-unwind` and no runtime glue, panics still terminate the
+> instance — they are merely *unwound* rather than *aborted*.
+
+`--panic-unwind` is also available for [`wasm-pack test`](./test.md).
+
+[wbg-catch-unwind]: https://wasm-bindgen.github.io/wasm-bindgen/reference/catch-unwind.html
+[non-rustup]: ../prerequisites/non-rustup-setups.md
+
 <hr style="font-size: 1.5em; margin-top: 2.5em"/>
 
 <sup id="footnote-0">0</sup> If you need to include additional assets in the pkg

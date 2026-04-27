@@ -41,6 +41,7 @@ pub struct Build {
     pub bindgen: Option<install::Status>,
     pub cache: Cache,
     pub extra_options: Vec<String>,
+    pub panic_unwind: bool,
     target_triple: String,
     wasm_path: Option<String>,
 }
@@ -184,6 +185,15 @@ pub struct BuildOptions {
     /// Option to skip optimization with wasm-opt
     pub no_opt: bool,
 
+    #[clap(long = "panic-unwind")]
+    /// Build with panic=unwind. Requires the nightly Rust toolchain; uses
+    /// `-Z build-std` to rebuild `std` with `-Cpanic=unwind` so panics can be
+    /// caught at FFI boundaries instead of aborting the WebAssembly instance.
+    /// The nightly toolchain, `rust-src` component, and nightly
+    /// `wasm32-unknown-unknown` target will be installed via `rustup` if not
+    /// already present.
+    pub panic_unwind: bool,
+
     /// List of extra options to pass to `cargo build`
     pub extra_options: Vec<String>,
 }
@@ -207,6 +217,7 @@ impl Default for BuildOptions {
             profile: None,
             out_dir: String::new(),
             out_name: None,
+            panic_unwind: false,
             extra_options: Vec::new(),
         }
     }
@@ -278,6 +289,7 @@ impl Build {
             cache: cache::get_wasm_pack_cache()?,
             target_triple: target_triple.to_owned(),
             extra_options,
+            panic_unwind: build_opts.panic_unwind,
             wasm_path: None,
         })
     }
@@ -364,6 +376,12 @@ impl Build {
     }
 
     fn step_check_rustc_version(&mut self) -> Result<()> {
+        // The stable rustc version is irrelevant when --panic-unwind is set,
+        // since cargo will be invoked via `+nightly`.
+        if self.panic_unwind {
+            info!("Skipping rustc version check (using nightly via --panic-unwind).");
+            return Ok(());
+        }
         info!("Checking rustc version...");
         let version = build::check_rustc_version()?;
         let msg = format!("rustc version is {}.", version);
@@ -379,6 +397,12 @@ impl Build {
     }
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
+        if self.panic_unwind {
+            info!("Checking nightly toolchain prerequisites for panic=unwind...");
+            build::wasm_target::check_nightly_prerequisites()?;
+            info!("Nightly prerequisites check was successful.");
+            return Ok(());
+        }
         info!("Checking for wasm-target...");
         build::wasm_target::check_for_wasm_target(&self.target_triple)?;
         info!("Checking for wasm-target was successful.");
@@ -392,6 +416,7 @@ impl Build {
             self.profile.clone(),
             &self.extra_options,
             &self.target_triple,
+            self.panic_unwind,
         )?;
         info!("wasm built at {wasm_path:#?}.");
         self.wasm_path = Some(wasm_path);
