@@ -99,6 +99,7 @@ pub struct Test {
     release: bool,
     test_runner_path: Option<PathBuf>,
     extra_options: Vec<String>,
+    target_triple: String,
 }
 
 type TestStep = fn(&mut Test) -> Result<()>;
@@ -138,6 +139,17 @@ impl Test {
         let crate_data = manifest::CrateData::new(&crate_path, None)?;
         let any_browser = chrome || firefox || safari;
 
+        let target_triple = {
+            let mut iter = extra_options.iter();
+            if iter.by_ref().any(|option| option == "--target") {
+                iter.next().map(|s| s.as_str())
+            } else {
+                None
+            }
+            .unwrap_or("wasm32-unknown-unknown")
+            .to_owned()
+        };
+
         if !node && !any_browser {
             bail!("Must specify at least one of `--node`, `--chrome`, `--firefox`, or `--safari`")
         }
@@ -164,6 +176,7 @@ impl Test {
             headless,
             release,
             test_runner_path: None,
+            target_triple,
             extra_options,
         })
     }
@@ -251,7 +264,7 @@ impl Test {
 
     fn step_check_for_wasm_target(&mut self) -> Result<()> {
         info!("Adding wasm-target...");
-        build::wasm_target::check_for_wasm_target("wasm32-unknown-unknown")?;
+        build::wasm_target::check_for_wasm_target(&self.target_triple)?;
         info!("Adding wasm-target was successful.");
         Ok(())
     }
@@ -267,7 +280,12 @@ impl Test {
             } else {
                 &self.extra_options
             };
-        build::cargo_build_wasm_tests(&self.crate_path, !self.release, extra_options)?;
+        build::cargo_build_wasm_tests(
+            &self.crate_path,
+            !self.release,
+            extra_options,
+            &self.target_triple,
+        )?;
 
         info!("Finished compiling tests to wasm.");
         Ok(())
@@ -311,17 +329,26 @@ impl Test {
     fn step_test_node(&mut self) -> Result<()> {
         assert!(self.node);
         info!("Running tests in node...");
+        let runner_env = format!(
+            "CARGO_TARGET_{}_RUNNER",
+            self.target_triple.replace('-', "_").to_uppercase()
+        );
+        let runner_path = self
+            .test_runner_path
+            .as_ref()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
         test::cargo_test_wasm(
             &self.crate_path,
             self.release,
             vec![
-                (
-                    "CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER",
-                    &**self.test_runner_path.as_ref().unwrap(),
-                ),
-                ("WASM_BINDGEN_TEST_ONLY_NODE", "1".as_ref()),
+                (runner_env, runner_path),
+                ("WASM_BINDGEN_TEST_ONLY_NODE".to_string(), "1".to_string()),
             ],
             &self.extra_options,
+            &self.target_triple,
         )?;
         info!("Finished running tests in node.");
         Ok(())
@@ -339,16 +366,21 @@ impl Test {
 
     fn step_test_chrome(&mut self) -> Result<()> {
         let chromedriver = self.chromedriver.as_ref().unwrap().display().to_string();
-        let chromedriver = chromedriver.as_str();
         info!(
             "Running tests in Chrome with chromedriver at {}",
             chromedriver
         );
 
         let mut envs = self.webdriver_env();
-        envs.push(("CHROMEDRIVER", chromedriver));
+        envs.push(("CHROMEDRIVER".to_string(), chromedriver));
 
-        test::cargo_test_wasm(&self.crate_path, self.release, envs, &self.extra_options)?;
+        test::cargo_test_wasm(
+            &self.crate_path,
+            self.release,
+            envs,
+            &self.extra_options,
+            &self.target_triple,
+        )?;
         Ok(())
     }
 
@@ -364,16 +396,21 @@ impl Test {
 
     fn step_test_firefox(&mut self) -> Result<()> {
         let geckodriver = self.geckodriver.as_ref().unwrap().display().to_string();
-        let geckodriver = geckodriver.as_str();
         info!(
             "Running tests in Firefox with geckodriver at {}",
             geckodriver
         );
 
         let mut envs = self.webdriver_env();
-        envs.push(("GECKODRIVER", geckodriver));
+        envs.push(("GECKODRIVER".to_string(), geckodriver));
 
-        test::cargo_test_wasm(&self.crate_path, self.release, envs, &self.extra_options)?;
+        test::cargo_test_wasm(
+            &self.crate_path,
+            self.release,
+            envs,
+            &self.extra_options,
+            &self.target_triple,
+        )?;
         Ok(())
     }
 
@@ -386,28 +423,43 @@ impl Test {
 
     fn step_test_safari(&mut self) -> Result<()> {
         let safaridriver = self.safaridriver.as_ref().unwrap().display().to_string();
-        let safaridriver = safaridriver.as_str();
         info!(
             "Running tests in Safari with safaridriver at {}",
             safaridriver
         );
 
         let mut envs = self.webdriver_env();
-        envs.push(("SAFARIDRIVER", safaridriver));
+        envs.push(("SAFARIDRIVER".to_string(), safaridriver));
 
-        test::cargo_test_wasm(&self.crate_path, self.release, envs, &self.extra_options)?;
+        test::cargo_test_wasm(
+            &self.crate_path,
+            self.release,
+            envs,
+            &self.extra_options,
+            &self.target_triple,
+        )?;
         Ok(())
     }
 
-    fn webdriver_env(&self) -> Vec<(&'static str, &str)> {
-        let test_runner = self.test_runner_path.as_ref().unwrap().to_str().unwrap();
+    fn webdriver_env(&self) -> Vec<(String, String)> {
+        let test_runner = self
+            .test_runner_path
+            .as_ref()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
         info!("Using wasm-bindgen test runner at {}", test_runner);
+        let runner_env = format!(
+            "CARGO_TARGET_{}_RUNNER",
+            self.target_triple.replace('-', "_").to_uppercase()
+        );
         let mut envs = vec![
-            ("CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER", test_runner),
-            ("WASM_BINDGEN_TEST_ONLY_WEB", "1"),
+            (runner_env, test_runner),
+            ("WASM_BINDGEN_TEST_ONLY_WEB".to_string(), "1".to_string()),
         ];
         if !self.headless {
-            envs.push(("NO_HEADLESS", "1"));
+            envs.push(("NO_HEADLESS".to_string(), "1".to_string()));
         }
         envs
     }
