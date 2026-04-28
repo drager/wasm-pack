@@ -160,3 +160,136 @@ fn rustup_add_wasm_target(target: &str) -> Result<()> {
 
     Ok(())
 }
+
+const NIGHTLY_TOOLCHAIN: &str = "nightly";
+
+/// Ensure that the nightly toolchain is installed and has the `rust-src`
+/// component and `wasm32-unknown-unknown` target, all of which are required
+/// for `-Z build-std` (used by `--panic-unwind`). Missing components are
+/// installed automatically via `rustup`.
+pub fn check_nightly_prerequisites() -> Result<()> {
+    let msg = format!(
+        "{}Checking nightly toolchain prerequisites for panic=unwind...",
+        emoji::TARGET
+    );
+    PBAR.info(&msg);
+
+    let nightly_sysroot = get_nightly_sysroot()?;
+    if !nightly_sysroot.exists() {
+        install_nightly_toolchain()?;
+    }
+
+    if !has_rust_src_component()? {
+        install_rust_src_component()?;
+    }
+
+    if !does_nightly_wasm32_target_exist() {
+        rustup_add_wasm_target_nightly()?;
+    }
+
+    Ok(())
+}
+
+fn get_nightly_sysroot() -> Result<PathBuf> {
+    let command = Command::new("rustc")
+        .args(["+nightly", "--print", "sysroot"])
+        .output()?;
+
+    if command.status.success() {
+        Ok(String::from_utf8(command.stdout)?.trim().into())
+    } else {
+        Err(anyhow!(
+            "Getting nightly rustc's sysroot wasn't successful. Got {}",
+            command.status
+        ))
+    }
+}
+
+fn install_nightly_toolchain() -> Result<()> {
+    let msg = format!(
+        "{}Installing nightly toolchain via rustup...",
+        emoji::TARGET
+    );
+    PBAR.info(&msg);
+
+    let mut cmd = Command::new("rustup");
+    cmd.arg("toolchain").arg("install").arg(NIGHTLY_TOOLCHAIN);
+    child::run(cmd, "rustup").context("Installing the nightly toolchain with rustup")?;
+
+    Ok(())
+}
+
+fn has_rust_src_component() -> Result<bool> {
+    let command = Command::new("rustup")
+        .args(["component", "list", "--toolchain", NIGHTLY_TOOLCHAIN])
+        .output()?;
+
+    if !command.status.success() {
+        return Ok(false);
+    }
+
+    let stdout = String::from_utf8(command.stdout)?;
+    Ok(stdout
+        .lines()
+        .any(|line| line.starts_with("rust-src") && line.contains("(installed)")))
+}
+
+fn install_rust_src_component() -> Result<()> {
+    let msg = format!(
+        "{}Installing rust-src component for nightly toolchain...",
+        emoji::TARGET
+    );
+    PBAR.info(&msg);
+
+    let mut cmd = Command::new("rustup");
+    cmd.arg("component")
+        .arg("add")
+        .arg("rust-src")
+        .arg("--toolchain")
+        .arg(NIGHTLY_TOOLCHAIN);
+    child::run(cmd, "rustup").context("Adding the rust-src component with rustup")?;
+
+    Ok(())
+}
+
+fn does_nightly_wasm32_target_exist() -> bool {
+    let command = Command::new("rustc")
+        .args([
+            "+nightly",
+            "--target",
+            "wasm32-unknown-unknown",
+            "--print",
+            "target-libdir",
+        ])
+        .output();
+
+    match command {
+        Ok(output) if output.status.success() => {
+            let path: PathBuf = String::from_utf8(output.stdout)
+                .ok()
+                .map(|s| s.trim().into())
+                .unwrap_or_default();
+            path.exists()
+        }
+        _ => false,
+    }
+}
+
+fn rustup_add_wasm_target_nightly() -> Result<()> {
+    let msg = format!(
+        "{}Adding wasm32-unknown-unknown target for nightly toolchain...",
+        emoji::TARGET
+    );
+    PBAR.info(&msg);
+
+    let mut cmd = Command::new("rustup");
+    cmd.arg("target")
+        .arg("add")
+        .arg("wasm32-unknown-unknown")
+        .arg("--toolchain")
+        .arg(NIGHTLY_TOOLCHAIN);
+    child::run(cmd, "rustup")
+        .context("Adding the wasm32-unknown-unknown target for nightly with rustup")?;
+
+    Ok(())
+}
