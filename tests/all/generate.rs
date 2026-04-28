@@ -1,5 +1,6 @@
 use crate::utils;
 use assert_cmd::prelude::*;
+use std::path::Path;
 
 #[test]
 fn new_with_no_name_errors() {
@@ -16,6 +17,8 @@ fn new_with_name_succeeds() {
         .wasm_pack()
         .arg("new")
         .arg("hello")
+        .arg("--template")
+        .arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("wasm-pack-template"))
         .assert()
         .success();
 }
