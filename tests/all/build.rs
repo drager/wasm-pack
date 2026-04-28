@@ -345,7 +345,14 @@ fn build_force() {
 fn build_from_new() {
     let fixture = utils::fixture::not_a_crate();
     let name = "generated-project";
-    fixture.wasm_pack().arg("new").arg(name).assert().success();
+    fixture
+        .wasm_pack()
+        .arg("new")
+        .arg(name)
+        .arg("--template")
+        .arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("wasm-pack-template"))
+        .assert()
+        .success();
     let project_location = fixture.path.join(&name);
     fixture
         .wasm_pack()
