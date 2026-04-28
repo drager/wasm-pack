@@ -1,0 +1,2 @@
+[template]
+sub_templates = ["wasm-pack-template"]
