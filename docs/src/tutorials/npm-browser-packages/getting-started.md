@@ -11,7 +11,7 @@ cargo install cargo-generate
 Then run:
 
 ```
-cargo generate --git https://github.com/rustwasm/wasm-pack wasm-pack-template
+cargo generate wasm-bindgen/wasm-pack
 ```
 
 You will be prompted to give your project a name. Once you do, you will have a directory

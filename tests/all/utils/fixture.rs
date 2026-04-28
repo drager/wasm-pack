@@ -132,7 +132,7 @@ impl Fixture {
                     description = "so awesome rust+wasm package"
                     license = "WTFPL"
                     name = "{}"
-                    repository = "https://github.com/drager/wasm-pack.git"
+                    repository = "https://github.com/wasm-bindgen/wasm-pack.git"
                     version = "0.1.0"
 
                     [lib]
@@ -170,7 +170,7 @@ impl Fixture {
                     description = "so awesome rust+wasm package"
                     license = "WTFPL"
                     name = "{}"
-                    repository = "https://github.com/drager/wasm-pack.git"
+                    repository = "https://github.com/wasm-bindgen/wasm-pack.git"
                     version = "0.1.0"
 
                     [lib]
@@ -213,7 +213,7 @@ impl Fixture {
                     description = "so awesome rust+wasm package"
                     name = "{}"
                     license-file = "{}"
-                    repository = "https://github.com/drager/wasm-pack.git"
+                    repository = "https://github.com/wasm-bindgen/wasm-pack.git"
                     version = "0.1.0"
 
                     [lib]
@@ -468,7 +468,7 @@ pub fn no_cdylib() -> Fixture {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "foo"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             # [lib]
@@ -639,7 +639,7 @@ pub fn transitive_dependencies() -> Fixture {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "main_project"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -689,7 +689,7 @@ pub fn transitive_dependencies() -> Fixture {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "project_a"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
@@ -739,7 +739,7 @@ pub fn transitive_dependencies() -> Fixture {
             description = "so awesome rust+wasm package"
             license = "WTFPL"
             name = "project_b"
-            repository = "https://github.com/drager/wasm-pack.git"
+            repository = "https://github.com/wasm-bindgen/wasm-pack.git"
             version = "0.1.0"
 
             [lib]
