@@ -15,9 +15,7 @@ pub fn generate(template: String, name: String, install_permitted: bool) -> Resu
         "latest",
         install_permitted,
     )?;
-    let template_subfolder =
-        (template == generate::DEFAULT_TEMPLATE).then_some(generate::DEFAULT_TEMPLATE_SUBFOLDER);
-    generate::generate(&template, template_subfolder, &name, &download)?;
+    generate::generate(&template, &name, &download)?;
 
     let msg = format!("🐑 Generated new project at /{}", name);
     PBAR.info(&msg);
